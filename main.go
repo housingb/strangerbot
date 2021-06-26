@@ -37,6 +37,8 @@ var (
 	startJobs            = make(chan int64, 10000)
 	updatesQueue         = make(chan *tgbotapi.Update, 10000)
 	endConversationQueue = make(chan EndConversationEvent, 10000)
+	updateMap            = NewIdRecorder()
+	messageMap           = NewIdRecorder()
 	stopped              = false
 )
 
@@ -333,30 +335,37 @@ func handleMessage(message *tgbotapi.Message) {
 	u, err := retrieveOrCreateUser(message.Chat.ID)
 
 	if err != nil {
-		log.Println(err)
+		log.Printf("retrieveOrCreateUser err: %s", err.Error())
 		return
 	}
 
 	if u.BannedUntil.Valid && time.Now().Before(u.BannedUntil.Time) {
 		date := u.BannedUntil.Time.Format("02 January 2006")
 		response := fmt.Sprintf("You are banned until %s", date)
-		telegram.SendMessage(message.Chat.ID, response, emptyOpts)
-		return
+		_, err := telegram.SendMessage(message.Chat.ID, response, emptyOpts)
+		if err != nil {
+			log.Printf("handleMessage telegram.SendMessage err: %s", err.Error())
+			return
+		}
 	}
 
 	sendToHandler(u, message)
 
 	updateLastActivity(u.ID)
+
 }
 
 func sendToHandler(u User, message *tgbotapi.Message) {
-	for _, handler := range commandHandlers {
-		res := handler(u, message)
 
+	for _, handler := range commandHandlers {
+
+		res := handler(u, message)
 		if res {
 			return
 		}
+
 	}
+
 }
 
 func processUpdates(offset int) int {
@@ -370,7 +379,8 @@ func processUpdates(offset int) int {
 	})
 
 	if err != nil {
-		log.Println(err)
+		log.Printf("GetUpdates err: %s", err.Error())
+		return offset
 	}
 
 	return handleUpdates(updates, offset)
@@ -380,15 +390,28 @@ func processUpdates(offset int) int {
 func handleUpdate(update *tgbotapi.Update) {
 
 	if update.Message != nil {
-		handleMessage(update.Message)
+
+		if !messageMap.IsSent(update.Message.MessageID) {
+			handleMessage(update.Message)
+			messageMap.SetSent(update.Message.MessageID)
+		} else {
+			log.Printf("message id:%d is handled", update.Message.MessageID)
+		}
+
 	} else if update.CallbackQuery != nil {
 		handleCallbackQuery(update.CallbackQuery)
 	}
+
 }
 
 func updateWorker(updates <-chan *tgbotapi.Update) {
 	for update := range updates {
-		handleUpdate(update)
+		if !updateMap.IsSent(update.UpdateID) {
+			handleUpdate(update)
+			updateMap.SetSent(update.UpdateID)
+		} else {
+			log.Printf("update id:%d is handled", update.UpdateID)
+		}
 	}
 }
 
