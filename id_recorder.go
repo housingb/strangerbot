@@ -19,8 +19,12 @@ func (m *IdRecorder) IsSent(id int) bool {
 	return ok
 }
 
-func (m *IdRecorder) SetSent(id int) {
+func (m *IdRecorder) SetSent(id int) bool {
 
-	m.data.Store(id, true)
+	_, loaded := m.data.LoadOrStore(id, true)
+	if loaded {
+		return false
+	}
 
+	return true
 }

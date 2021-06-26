@@ -392,8 +392,12 @@ func handleUpdate(update *tgbotapi.Update) {
 	if update.Message != nil {
 
 		if !messageMap.IsSent(update.Message.MessageID) {
-			handleMessage(update.Message)
-			messageMap.SetSent(update.Message.MessageID)
+			if messageMap.SetSent(update.Message.MessageID) {
+				handleMessage(update.Message)
+			} else {
+				log.Printf("message id:%d is handled", update.Message.MessageID)
+			}
+
 		} else {
 			log.Printf("message id:%d is handled", update.Message.MessageID)
 		}
@@ -407,8 +411,11 @@ func handleUpdate(update *tgbotapi.Update) {
 func updateWorker(updates <-chan *tgbotapi.Update) {
 	for update := range updates {
 		if !updateMap.IsSent(update.UpdateID) {
-			handleUpdate(update)
-			updateMap.SetSent(update.UpdateID)
+			if updateMap.SetSent(update.UpdateID) {
+				handleUpdate(update)
+			} else {
+				log.Printf("update id:%d is handled", update.UpdateID)
+			}
 		} else {
 			log.Printf("update id:%d is handled", update.UpdateID)
 		}
