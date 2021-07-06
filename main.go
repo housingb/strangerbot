@@ -434,8 +434,6 @@ func handleUpdates(updates []tgbotapi.Update, offset int) int {
 
 	for i, update := range updates {
 
-		log.Printf("offset: %d msg_id: %d msg_text: %s", update.UpdateID, update.Message.MessageID, update.Message.Text)
-
 		if update.UpdateID >= offset {
 			if update.UpdateID%1000 == 0 {
 				log.Printf("Update ID: %d", update.UpdateID)
