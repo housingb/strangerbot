@@ -12,12 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/Machiel/telegrambot"
 	_ "github.com/go-sql-driver/mysql"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
+	"strangerbot/repository"
 )
 
 var (
@@ -55,6 +55,24 @@ func main() {
 	mysqlDatabaseName := os.Getenv("MYSQL_DATABASE_NAME")
 	telegramBotKey := os.Getenv("TELEGRAM_BOT_KEY")
 
+	// init gorm db
+	if err := InitDB(Database{
+		Host:            "localhost",
+		Port:            3306,
+		Username:        mysqlUser,
+		Password:        mysqlPassword,
+		DBName:          mysqlDatabaseName,
+		Charset:         "utf8",
+		MaxOpenConns:    1000,
+		MaxIdleConns:    1000,
+		ConnMaxLifetime: 10,
+	}); err != nil {
+		panic(err)
+	}
+
+	_ = repository.InitRepository(DB)
+
+	// init sqlx db
 	dsn := fmt.Sprintf("%s:%s@(localhost:3306)/%s?parseTime=true", mysqlUser, mysqlPassword, mysqlDatabaseName)
 	db, err = sqlx.Open("mysql", dsn)
 

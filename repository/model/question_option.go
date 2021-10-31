@@ -1,0 +1,121 @@
+package model
+
+import (
+	"context"
+	"fmt"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"strangerbot/keyboard"
+	"strangerbot/repository/gorm_global"
+	"strangerbot/vars"
+)
+
+type QuestionOption struct {
+	gorm_global.ColumnCreateModifyDeleteTime
+	QuestionId       int64
+	OptionType       int64
+	Label            string
+	Value            string
+	IsMatchingAny    bool
+	MatchingOptionId int64
+	Sort             int64
+	RowIndex         int64
+}
+
+func (q *QuestionOption) TableName() string {
+	return "bot_option"
+}
+
+func (q *QuestionOption) GetOptionLabel(userData *UserQuestionData) string {
+
+	if userData != nil {
+		return fmt.Sprintf("%s %s", vars.ChooseMark, q.Label)
+	}
+
+	return q.Label
+}
+
+func (q *QuestionOption) GetKeyboardButton(userData *UserQuestionData) tgbotapi.InlineKeyboardButton {
+
+	return tgbotapi.InlineKeyboardButton{
+		Text: q.GetOptionLabel(userData),
+		CallbackData: keyboard.KeyboardCallbackDataPlus{
+			ButtonType:  keyboard.BUTTON_TYPE_OPTION,
+			ButtonRelId: q.ID,
+		}.CallbackData(),
+	}
+
+}
+
+type Options []*QuestionOption
+
+func (m Options) GetKeyboardButton(userDatas map[int64]*UserQuestionData) [][]tgbotapi.InlineKeyboardButton {
+
+	rowMap := make(map[int64][]tgbotapi.InlineKeyboardButton)
+	for _, item := range m {
+
+		var userData *UserQuestionData
+		if v, ok := userDatas[item.ID]; ok {
+			userData = v
+		}
+
+		if _, ok := rowMap[item.RowIndex]; ok {
+			rowMap[item.RowIndex] = append(rowMap[item.RowIndex], item.GetKeyboardButton(userData))
+		} else {
+			rowMap[item.RowIndex] = []tgbotapi.InlineKeyboardButton{
+				item.GetKeyboardButton(userData),
+			}
+		}
+
+	}
+
+	rs := make([][]tgbotapi.InlineKeyboardButton, 0, len(rowMap))
+	for _, v := range rowMap {
+		rs = append(rs, v)
+	}
+
+	return rs
+}
+
+func (m Options) GetQuestionOptions(ctx context.Context, questions Questions) Options {
+
+	rs := make([]*QuestionOption, 0, len(m))
+	for i, item := range m {
+		for _, question := range questions {
+			if item.QuestionId == question.ID {
+				rs = append(rs, m[i])
+			}
+		}
+	}
+
+	return rs
+}
+
+func (m Options) GetOption(optionId int64) *QuestionOption {
+	for i, item := range m {
+		if item.ID == optionId {
+			return m[i]
+		}
+	}
+	return nil
+}
+
+func (m Options) GetOptionByMapping(mappingOptionId int64) *QuestionOption {
+	for i, item := range m {
+		if item.MatchingOptionId == mappingOptionId {
+			return m[i]
+		}
+	}
+	return nil
+}
+
+func (m Options) IsHasAnythingOption(questionId int64) *QuestionOption {
+	for i, item := range m {
+		if item.QuestionId == questionId {
+			if item.IsMatchingAny {
+				return m[i]
+			}
+		}
+	}
+	return nil
+}

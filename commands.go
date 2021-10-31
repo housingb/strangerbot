@@ -1,13 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"strings"
 	"time"
 
 	"github.com/Machiel/telegrambot"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"strangerbot/repository"
+	"strangerbot/vars"
 )
 
 // CommandHandler supplies an interface for handling messages
@@ -86,14 +88,13 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	}
 
 	if !u.IsProfileFinish() {
-		//_, _ = RetrySendMessage(u.ChatID, fmt.Sprintf("please /setup configure your profile: %s", u.GetNeedFinishProfile()), emptyOpts)
-		_, _ = RetrySendMessage(u.ChatID, fmt.Sprintf("please /setup configure your profile"), emptyOpts)
+		_, _ = RetrySendMessage(u.ChatID, vars.NotProfileFinishMessage, emptyOpts)
 		return false
 	}
 
 	db.Exec("UPDATE users SET available = 1 WHERE chat_id = ?", u.ChatID)
 
-	_, _ = RetrySendMessage(u.ChatID, "Looking for another student to match you with... Hold on! (This may take a while! Keep your notifications on!) **NOTE: If you send anything illegal here, your data will be handed over to the police. Your User ID is anonymous only until you break the rules. A police report for harassment/defamation will be filed if you pass off another user's contact as if it is yours.** To report a user, enter **/report (followed by a reason; don't leave blank)** into the chat. If chat with a user you want to report has already ended, then **do not** start a new chat—immediately contact the admin @aaldentnay . **Also, a note to some guys here—pls stop being thirsty on here because that scares new users away; I'm taking a huge leapt of faith when I set up a platform like this. Those reported will be PERMANENTLY banned.** Misuse of /report , if not accidental, can also result in ban.", emptyOpts)
+	_, _ = RetrySendMessage(u.ChatID, vars.StartMatchingMessage, emptyOpts)
 	startJobs <- u.ChatID
 
 	return true
@@ -252,6 +253,8 @@ If you require any help, feel free to contact @aaldentnay !`, emptyOpts)
 
 func commandSetup(u User, m *tgbotapi.Message) bool {
 
+	ctx := context.TODO()
+
 	if len(m.Text) < 6 {
 		return false
 	}
@@ -260,21 +263,16 @@ func commandSetup(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
-	msg := tgbotapi.NewMessage(m.Chat.ID, `What is your gender?`)
-
-	msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup([]tgbotapi.InlineKeyboardButton{
-		{
-			Text:         GenderOptionMaleText + GenderOptionMaleNoteText,
-			CallbackData: &GenderMale,
-		},
-		{
-			Text:         GenderOptionFemaleText + GenderOptionFemaleNoteText,
-			CallbackData: &GenderFemale,
-		},
-	})
-
-	_, err := RetrySend(msg)
+	repo := repository.GetRepository()
+	menus, err := repo.GetMenuList(ctx, 0)
 	if err != nil {
+		return true
+	}
+
+	msg := tgbotapi.NewMessage(m.Chat.ID, vars.TopMenuMessage)
+	msg.ReplyMarkup = menus.GetKeyboardMarkup()
+
+	if _, err := RetrySend(msg); err != nil {
 		log.Printf("Send err: %s", err.Error())
 	}
 
