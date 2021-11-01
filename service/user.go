@@ -13,6 +13,31 @@ var (
 	ErrUserNotFillAllQuestion = errors.New("user not fill all question")
 )
 
+func ServiceCheckUserFillFull(ctx context.Context, chatId int64) (bool, error) {
+
+	repo := repository.GetRepository()
+
+	// find all question
+	questions, err := repo.GetAllQuestion(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	// find user all user question data
+	userQuestionData, err := repo.GetUserQuestionDataByUser(ctx, chatId)
+	if err != nil {
+		return false, err
+	}
+
+	// check user fill full
+	fillFull, _ := model.Questions(questions).CheckUserFillFull(userQuestionData)
+	if fillFull {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func ServiceMatch(ctx context.Context, chatId int64) (*model.User, error) {
 
 	repo := repository.GetRepository()
@@ -45,6 +70,10 @@ func ServiceMatch(ctx context.Context, chatId int64) (*model.User, error) {
 	chatIds, err := repo.GetChatByMatching(ctx, chatId, questions, options, userQuestionData)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(chatIds) == 0 {
+		return nil, nil
 	}
 
 	// shuffle chat id

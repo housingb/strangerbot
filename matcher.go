@@ -1,8 +1,16 @@
 package main
 
-import "log"
+import (
+	"context"
+	"log"
+
+	"strangerbot/service"
+	"strangerbot/vars"
+)
 
 func matchUsers(chatIDs <-chan int64) {
+
+	ctx := context.TODO()
 
 	for c := range chatIDs {
 
@@ -18,32 +26,28 @@ func matchUsers(chatIDs <-chan int64) {
 			continue
 		}
 
-		availableUsers, err := retrieveAvailableUsers(c, user)
-
+		matchUser, err := service.ServiceMatch(ctx, user.ChatID)
 		if err != nil {
 			log.Printf("Error retrieving available users: %s", err)
 			continue
 		}
 
-		if len(availableUsers) == 0 {
+		if matchUser == nil {
 			continue
 		}
 
-		shuffle(availableUsers)
+		createMatch(user.ChatID, user.ID, matchUser.ChatID, matchUser.ID)
 
-		match := availableUsers[0]
-
-		createMatch(user, match)
 	}
 
 }
 
-func createMatch(user User, match User) {
+func createMatch(userChatId, userId, matchUserChatId, matchUserId int64) {
 	query := "UPDATE users SET match_chat_id = ? WHERE id = ?"
 
-	db.Exec(query, user.ChatID, match.ID)
-	db.Exec(query, match.ChatID, user.ID)
+	db.Exec(query, userChatId, matchUserId)
+	db.Exec(query, matchUserChatId, userId)
 
-	telegram.SendMessage(match.ChatID, "You have been matched, have fun!", emptyOpts)
-	telegram.SendMessage(user.ChatID, "You have been matched, have fun!", emptyOpts)
+	telegram.SendMessage(matchUserChatId, vars.MatchedMessage, emptyOpts)
+	telegram.SendMessage(userChatId, vars.MatchedMessage, emptyOpts)
 }

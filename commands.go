@@ -9,6 +9,7 @@ import (
 	"github.com/Machiel/telegrambot"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/repository"
+	"strangerbot/service"
 	"strangerbot/vars"
 )
 
@@ -87,7 +88,13 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
-	if !u.IsProfileFinish() {
+	isFull, err := service.ServiceCheckUserFillFull(nil, u.ChatID)
+	if err != nil {
+		log.Println(err.Error())
+		return false
+	}
+
+	if !isFull {
 		_, _ = RetrySendMessage(u.ChatID, vars.NotProfileFinishMessage, emptyOpts)
 		return false
 	}
@@ -233,20 +240,7 @@ func commandHelp(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
-	_, _ = RetrySendMessage(m.Chat.ID, `Help:
-
-Use /start to start looking for a conversational partner, once you're matched you can use /end to end the conversation.
-
-Use /report to report a user, use it as follows:
-/report <reason>
-
-Use /nopics to disable receiving photos, and /nopics if you want to enable it again.
-
-HEAD OVER to @unichatbotchannel for rules, updates, announcements or info on how you can support the bot!
-
-Sending images and videos are a beta functionality, but appear to be working fine.
-
-If you require any help, feel free to contact @aaldentnay !`, emptyOpts)
+	_, _ = RetrySendMessage(m.Chat.ID, vars.HelpMessage, emptyOpts)
 
 	return true
 }
