@@ -28,6 +28,7 @@ type Question struct {
 	Sort               int64
 	MatchingMode       int64
 	MatchingQuestionId int64
+	MaxMultiLen        int
 }
 
 func (q *Question) TableName() string {

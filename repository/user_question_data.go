@@ -72,6 +72,22 @@ func (p *Repository) DeleteUserQuestionDataByQuestion(ctx context.Context, chatI
 	return nil
 }
 
+func (p *Repository) GetUserQuestionDataByUserQuestion(ctx context.Context, chatId int64, questionId int64) ([]*model.UserQuestionData, error) {
+	q := p.db.Where("chat_id = ? AND question_id = ? AND is_del = 0", chatId, questionId)
+
+	var list []*model.UserQuestionData
+
+	if err := q.Model(&model.UserQuestionData{}).Find(&list).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return list, nil
+}
+
 func (p *Repository) GetUserQuestionDataByUser(ctx context.Context, chatId int64) ([]*model.UserQuestionData, error) {
 	q := p.db.Where("chat_id = ? AND is_del = 0", chatId)
 

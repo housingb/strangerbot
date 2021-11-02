@@ -34,6 +34,7 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 
 	var (
 		msgs []*tgbotapi.MessageConfig
+		cbs  []tgbotapi.CallbackConfig
 	)
 	switch data.ButtonType {
 	case keyboard.BUTTON_TYPE_MENU:
@@ -44,9 +45,18 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	case keyboard.BUTTON_TYPE_QUESTION:
 
 	case keyboard.BUTTON_TYPE_OPTION:
-		msgs, err = service.ServiceQuestionOption(ctx, callbackQuery.Message.Chat.ID, data)
+		msgs, cbs, err = service.ServiceQuestionOption(ctx, callbackQuery.Message.Chat.ID, data)
 		if err != nil {
 			return
+		}
+	}
+
+	// send callback
+	for _, cb := range cbs {
+		cb.CallbackQueryID = callbackQuery.ID
+		_, err = telegramBot.AnswerCallbackQuery(cb)
+		if err != nil {
+			log.Println(err.Error())
 		}
 	}
 
