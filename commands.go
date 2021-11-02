@@ -102,6 +102,8 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	db.Exec("UPDATE users SET available = 1 WHERE chat_id = ?", u.ChatID)
 
 	_, _ = RetrySendMessage(u.ChatID, vars.StartMatchingMessage, emptyOpts)
+	_, _ = RetrySendMessage(u.ChatID, vars.StartMatchingMessage, emptyOpts)
+
 	startJobs <- u.ChatID
 
 	return true

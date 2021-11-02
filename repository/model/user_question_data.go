@@ -33,3 +33,13 @@ func (u UserQuestionDataList) GetUserQuestionDataByOptions(ctx context.Context, 
 
 	return rs
 }
+
+func (u UserQuestionDataList) GetOptionIds() []int64 {
+
+	rs := make([]int64, 0, len(u))
+	for _, item := range u {
+		rs = append(rs, item.OptionId)
+	}
+
+	return rs
+}

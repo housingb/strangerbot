@@ -91,6 +91,21 @@ func (m Options) GetQuestionOptions(ctx context.Context, questions Questions) Op
 	return rs
 }
 
+func (m Options) GetOptionsByIds(ids []int64) []string {
+
+	rs := make([]string, 0, len(ids))
+
+	for _, id := range ids {
+		for i, item := range m {
+			if item.ID == id {
+				rs = append(rs, m[i].Label)
+			}
+		}
+	}
+
+	return rs
+}
+
 func (m Options) GetOption(optionId int64) *QuestionOption {
 	for i, item := range m {
 		if item.ID == optionId {

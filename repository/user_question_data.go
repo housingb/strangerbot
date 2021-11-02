@@ -7,6 +7,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"strangerbot/repository/model"
+	"strangerbot/vars"
 )
 
 func (r *Repository) UserQuestionDataAdd(ctx context.Context, po *model.UserQuestionData) error {
@@ -87,7 +88,7 @@ func (p *Repository) GetUserQuestionDataByUser(ctx context.Context, chatId int64
 	return list, nil
 }
 
-func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questions model.Questions, options model.Options, userQuestionData model.UserQuestionDataList) ([]int64, error) {
+func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questions model.Questions, options model.Options, userQuestionData model.UserQuestionDataList) ([]int64, model.UserQuestionDataList, error) {
 
 	// matching options data
 	matchingQuestion := questions.GetMatchingQuestion()
@@ -156,9 +157,11 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 	// build sql
 	var sub *gorm.DB
 
-	//sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE option_id IN(?) AND chat_id IN((SELECT chat_id FROM users WHERE chat_id != ? AND available = 1 AND match_chat_id IS NULL)) GROUP BY chat_id,question_id) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", allMatchingOptions, chatId, matchingQuestionNum)
-
-	sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE option_id IN(?) AND chat_id IN((SELECT chat_id FROM users WHERE available = 1 AND match_chat_id IS NULL)) GROUP BY chat_id,question_id) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", allMatchingOptions, matchingQuestionNum)
+	if vars.RUN_MODE == "debug" {
+		sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE option_id IN(?) AND chat_id IN((SELECT chat_id FROM users WHERE available = 1 AND match_chat_id IS NULL)) GROUP BY chat_id,question_id) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", allMatchingOptions, matchingQuestionNum)
+	} else {
+		sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE option_id IN(?) AND chat_id IN((SELECT chat_id FROM users WHERE chat_id != ? AND available = 1 AND match_chat_id IS NULL)) GROUP BY chat_id,question_id) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", allMatchingOptions, chatId, matchingQuestionNum)
+	}
 
 	sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE chat_id IN(?) AND option_id IN(?)) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", sub.QueryExpr(), allProfileMatchingOptions, profileMatchingQuestionNum)
 
@@ -168,9 +171,9 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 
 	if err := sub.Scan(&data).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+			return nil, nil, nil
 		}
-		return nil, err
+		return nil, nil, err
 	}
 
 	rs := make([]int64, 0, len(data))
@@ -178,5 +181,5 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 		rs = append(rs, item.ChatId)
 	}
 
-	return rs, nil
+	return rs, userMatchingData, nil
 }
