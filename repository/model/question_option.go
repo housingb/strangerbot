@@ -134,3 +134,15 @@ func (m Options) IsHasAnythingOption(questionId int64) *QuestionOption {
 	}
 	return nil
 }
+
+func (m Options) GetOptionsByQuestionId(questionId int64) Options {
+
+	rs := make([]*QuestionOption, 0, len(m))
+	for i, item := range m {
+		if item.QuestionId == questionId {
+			rs = append(rs, m[i])
+		}
+	}
+
+	return rs
+}

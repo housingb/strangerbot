@@ -23,11 +23,16 @@ HEAD OVER to @unichatbotchannel for rules, updates, announcements or info on how
 Sending images and videos are a beta functionality, but appear to be working fine.
 
 If you require any help, feel free to contact @aaldentnay !`
-	MatchedMessage = `You have been matched, have fun! Your match is %s`
+	MatchedMessage       = `You have been matched, have fun! Your match is %s and is open to %s!`
 	QuestionCallbackTest = `This question can only have %d options at most`
 )
 
 // emoji UTF-8 from https://apps.timwhitlock.info/emoji/tables/unicode
 const (
 	ChooseMark = "\xE2\x9C\x85"
+)
+
+// set goals question id, it work for MatchedMessage.
+const (
+	GoalsQuestionId int64 = 7
 )
