@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/keyboard"
@@ -23,6 +25,13 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	_ = u
 	if err != nil {
 		log.Println(err)
+		return
+	}
+
+	if u.BannedUntil.Valid && time.Now().Before(u.BannedUntil.Time) {
+		date := u.BannedUntil.Time.Format("02 January 2006")
+		response := fmt.Sprintf("You are banned until %s", date)
+		telegram.SendMessage(callbackQuery.Message.Chat.ID, response, emptyOpts)
 		return
 	}
 
