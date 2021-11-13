@@ -25,6 +25,7 @@ Sending images and videos are a beta functionality, but appear to be working fin
 If you require any help, feel free to contact @aaldentnay !`
 	MatchedMessage       = `You have been matched, have fun! Your match is %s and is open to %s!`
 	QuestionCallbackTest = `This question can only have %d options at most`
+	BanMessage           = `You are banned until %s`
 )
 
 // emoji UTF-8 from https://apps.timwhitlock.info/emoji/tables/unicode
