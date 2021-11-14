@@ -257,8 +257,7 @@ func retrieveOrCreateUser(chatID int64) (User, error) {
 			return u, err
 		}
 
-		telegram.SendMessage(chatID, `Welcome! This bot was started in light of COVID-19 restrictions which meant less opportunities for interaction in university! Whether you're here just to know your cohort mates, find a study buddy, make new friends or have a listening ear, this is the chat bot for you. While conversations are anonymous, you're more than welcome to exchange contacts after a quick chat (do stay safe though)!
-
+		telegram.SendMessage(chatID, `Welcome to the A5.2 Telegram Bot! :D
 		To get started enter:
 
 		/start
@@ -269,18 +268,10 @@ func retrieveOrCreateUser(chatID int64) (User, error) {
 
 		If you feel like ending the conversation, type:
 
-		/bye
+		/end
 
-		If you want another chat partner, type /start again after typing /bye!
-		
-		Enter /report (followed by reason) to report abuse; note that this users who abuse the platform will be banned permanently. Note that advertising is also not allowed!
-		Enter /nopics to prevent others from sending pics to you!
-		
-		HEAD TO @unichatbotchannel for rules, announcements, etc. first before proceeding! :)
-		
-		Feel free to contact @aaldentnay if you need any assistance!
-		Note that information of anyone who breaches rules will be tracked. Anything illegal will be reported to the police. Be careful with your personal information.
-
+		If you want another chat partner, type /start again after typing /end!
+	
 		Have fun!`, emptyOpts)
 	}
 
