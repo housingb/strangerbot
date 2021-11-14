@@ -67,8 +67,11 @@ You can then run start StrangerBot by running `strangerbot` in your terminal.
 | --- | --- | --- |
 | question_id | 0 | question id it form form_question table |
 | option_type | 1 | option type 1.value option, now only have one type. |
+| matching_option_id | 0 | match option id |
 | label | | option label. |
 | value | | option value. |
 | is_matching_any | 0 | 0.false 1.true |
 | sort | 0 | order by sort asc |
 | row_index | 0 | same row index will be inline |
+
+
