@@ -31,3 +31,44 @@ TELEGRAM_BOT_KEY
 ```
 
 You can then run start StrangerBot by running `strangerbot` in your terminal.
+
+## Menu configuration
+
+| Field | Default | Description |
+| --- | --- | --- |
+| parent_id | 0 | parent menu id 0.top menu >0.sub menu |
+| target_type | 1 | target 1.menu to menu 2. menu to question |
+| name | | menu name(title) |
+| question_id | | if target_type is 2, this field must be set question id |
+| sort | 0 | order by sort asc |
+| row_index | 0 | same row index will be inline |
+| helper_title | | menu helper title |
+| helper_text | | menu helper text |
+| is_back_enabled | 1 | show back button 0.false 1.true |
+| back_button_text | Back | back button text |
+
+## Question configuration
+
+| Field | Default | Description |
+| --- | --- | --- |
+| scene_type | 0 | scene type 1.profile question 2.matching question |
+| helper_title | | question helper title |
+| title | | question title |
+| helper_text | | helper text |
+| frontend_type | 1 | frontend type 1.select 2.multi select |
+| max_multi_len | 0 | multi select max choose option length, 0 is not limits. |
+| sort | 0 | order by sort asc, this field not used. |
+| matching_mode | 1 | order by sort asc, this field not used. |
+| matching_question_id | 0 | if scene is matching , it is origin question id, if 0 it will not support matching |
+
+## Option configuration
+
+| Field | Default | Description |
+| --- | --- | --- |
+| question_id | 0 | question id it form form_question table |
+| option_type | 1 | option type 1.value option, now only have one type. |
+| label | | option label. |
+| value | | option value. |
+| is_matching_any | 0 | 0.false 1.true |
+| sort | 0 | order by sort asc |
+| row_index | 0 | same row index will be inline |
