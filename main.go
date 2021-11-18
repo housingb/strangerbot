@@ -356,6 +356,7 @@ func handleMessage(message *tgbotapi.Message) {
 			log.Printf("handleMessage telegram.SendMessage err: %s", err.Error())
 			return
 		}
+		return
 	}
 
 	sendToHandler(u, message)
