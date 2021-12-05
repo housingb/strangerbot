@@ -15,6 +15,14 @@ If you have go installed, you can install strangerbot like this:
 
 `go get -u github.com/Machiel/strangerbot`
 
+# How Run?
+
+1. cd /root/go/src/strangerbot dir
+2. run 'go install .'
+3. cd /root/go/bin
+4. modify start.sh,edit telegram bot key
+5. sh start.sh
+
 # Usage
 
 Make sure you have MySQL installed, and retrieved an API key from Telegram.
