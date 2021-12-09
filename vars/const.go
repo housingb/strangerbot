@@ -2,7 +2,7 @@ package vars
 
 var (
 	// debug or prod
-	RUN_MODE = "prod"
+	RUN_MODE = "debug"
 )
 
 const (
@@ -23,9 +23,16 @@ HEAD OVER to @unichatbotchannel for rules, updates, announcements or info on how
 Sending images and videos are a beta functionality, but appear to be working fine.
 
 If you require any help, feel free to contact @aaldentnay !`
-	MatchedMessage       = `You have been matched, have fun! Your match is %s and is open to %s!`
-	QuestionCallbackTest = `This question can only have %d options at most`
-	BanMessage           = `You are banned until %s`
+	MatchedMessage           = `You have been matched, have fun! Your match is %s and is open to %s!`
+	QuestionCallbackTest     = `This question can only have %d options at most`
+	BanMessage               = `You are banned until %s`
+	RegTipMessage            = `You’re done setting up! As a final step before we find you a match, we will need to know your school email address. Don’t worry, this will be anonymous to other users! This is just to verify you’re a student :)`
+	NeedInputEmailMessage    = `What is your student email address?`
+	SendEmailCodeMessage     = `We've e-mailed you a code. Please check your e-mail and Enter the code here to complete the verification.`
+	OTPNoExistsMessage       = `Code is not exists,Please re-enter email or code.`
+	OTPFailMessage           = `Code is not match,Please re-enter email or code.`
+	OTPSuccessMessage        = `Register Success! Please click /start to match.`
+	NotAccessRegisterMessage = `Sorry, you do not have the authorization to register.`
 )
 
 // emoji UTF-8 from https://apps.timwhitlock.info/emoji/tables/unicode

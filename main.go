@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	"errors"
+	"flag"
 	"fmt"
 	"math/rand"
 	"os"
@@ -17,7 +19,10 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
+	"strangerbot/otpgateway"
+	"strangerbot/otpgateway/smtp"
 	"strangerbot/repository"
+	"strangerbot/vars"
 )
 
 var (
@@ -47,45 +52,100 @@ func main() {
 	numCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPU)
 
+	// flag params
+	configFilename := flag.String("cfg", "app.toml", "config filename,didn't need input file extend name.")
+	if len(*configFilename) == 0 {
+		panic(errors.New("config filename is empty"))
+	}
+
+	log.Println("config file: ", *configFilename)
+
 	var err error
 
 	log.Println("Starting...")
-	mysqlUser := os.Getenv("MYSQL_USER")
-	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
-	mysqlDatabaseName := os.Getenv("MYSQL_DATABASE_NAME")
-	telegramBotKey := os.Getenv("TELEGRAM_BOT_KEY")
+
+	// config init
+	upCfg := make(chan struct{})
+	err = WatchConfig(upCfg, *configFilename)
+	if err != nil {
+		panic(err)
+	}
+	defer close(upCfg)
+
+	// load config
+	cfg, err := LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	// init white cfg
+	vars.WhiteDomainEnabled = cfg.WhiteList.WhiteDomainEnabled
+	vars.WhiteDomain = cfg.WhiteList.WhiteDomain
+	vars.WhiteEmailEnabled = cfg.WhiteList.WhiteEmailEnabled
 
 	// init gorm db
-	if err := InitDB(Database{
-		Host:            "localhost",
-		Port:            3306,
-		Username:        mysqlUser,
-		Password:        mysqlPassword,
-		DBName:          mysqlDatabaseName,
-		Charset:         "utf8",
-		MaxOpenConns:    1000,
-		MaxIdleConns:    1000,
-		ConnMaxLifetime: 10,
-	}); err != nil {
+	if err := InitDB(cfg.MysqlDB); err != nil {
 		panic(err)
 	}
 
 	_ = repository.InitRepository(DB)
 
 	// init sqlx db
-	dsn := fmt.Sprintf("%s:%s@(localhost:3306)/%s?parseTime=true", mysqlUser, mysqlPassword, mysqlDatabaseName)
+	dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?parseTime=true", cfg.MysqlDB.Username, cfg.MysqlDB.Password, cfg.MysqlDB.Host, cfg.MysqlDB.Port, cfg.MysqlDB.DBName)
 	db, err = sqlx.Open("mysql", dsn)
 
 	if err != nil {
 		panic(err)
 	}
 
-	telegram = telegrambot.New(telegramBotKey)
-	telegramBot, err = tgbotapi.NewBotAPI(telegramBotKey)
+	// init telegram bot
+	telegram = telegrambot.New(cfg.Telegram.BotKey)
+	telegramBot, err = tgbotapi.NewBotAPI(cfg.Telegram.BotKey)
 	if err != nil {
 		panic(err)
 	}
 
+	// load tpl
+	otpTpl, err := otpgateway.LoadProviderTemplates(cfg.EmailOTP.Template, cfg.EmailOTP.Subject)
+	if err != nil {
+		panic(err)
+	}
+	_ = otpTpl
+
+	// init smtp
+	_, err = smtp.InitEmailer([]byte(cfg.EmailOTP.Config))
+	if err != nil {
+		panic(err)
+	}
+
+	// init store
+	store := otpgateway.NewRedisStore(otpgateway.RedisConf{
+		Host:      cfg.RedisConf.Host,
+		Port:      cfg.RedisConf.Port,
+		Username:  cfg.RedisConf.Username,
+		Password:  cfg.RedisConf.Password,
+		MaxActive: cfg.RedisConf.MaxActive,
+		MaxIdle:   cfg.RedisConf.MaxIdle,
+		Timeout:   time.Duration(cfg.RedisConf.TimeoutSeconds) * time.Second,
+		KeyPrefix: cfg.RedisConf.KeyPrefix,
+	})
+
+	// init otp master
+	OTPMasterIns = NewOTPMaster(
+		cfg.Telegram.Namespace,
+		store,
+		otpTpl,
+		smtp.GetEmailer(),
+		time.Duration(cfg.OTPConf.OTPTTL)*time.Second,
+		cfg.OTPConf.OTPMaxAttempts,
+		cfg.OTPConf.OTPMaxLen,
+	)
+
+	if OTPMasterIns == nil {
+		panic(errors.New("OTP Master is nil"))
+	}
+
+	// start open goroutine to listen
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -197,18 +257,21 @@ func loadAvailableUsers(startJobs chan<- int64) {
 
 // User holds user data
 type User struct {
-	ID            int64         `db:"id"`
-	ChatID        int64         `db:"chat_id"`
-	Available     bool          `db:"available"`
-	LastActivity  time.Time     `db:"last_activity"`
-	MatchChatID   sql.NullInt64 `db:"match_chat_id"`
-	RegisterDate  time.Time     `db:"register_date"`
-	PreviousMatch sql.NullInt64 `db:"previous_match"`
-	AllowPictures bool          `db:"allow_pictures"`
-	BannedUntil   NullTime      `db:"banned_until"`
-	Gender        int           `db:"gender"`
-	Tags          string        `db:"tags"`
-	MatchMode     int           `db:"match_mode"`
+	ID               int64         `db:"id"`
+	ChatID           int64         `db:"chat_id"`
+	Available        bool          `db:"available"`
+	LastActivity     time.Time     `db:"last_activity"`
+	MatchChatID      sql.NullInt64 `db:"match_chat_id"`
+	RegisterDate     time.Time     `db:"register_date"`
+	PreviousMatch    sql.NullInt64 `db:"previous_match"`
+	AllowPictures    bool          `db:"allow_pictures"`
+	BannedUntil      NullTime      `db:"banned_until"`
+	Gender           int           `db:"gender"`
+	Tags             string        `db:"tags"`
+	MatchMode        int           `db:"match_mode"`
+	Email            string        `db:"email"`
+	IsVerify         bool          `db:"is_verify"`
+	IsWaitInputEmail bool          `db:"is_wait_input_email"`
 }
 
 func (u User) IsProfileFinish() bool {

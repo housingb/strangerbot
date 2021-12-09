@@ -8,6 +8,7 @@ import (
 
 	"github.com/Machiel/telegrambot"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"strangerbot/otpgateway"
 	"strangerbot/repository"
 	"strangerbot/service"
 	"strangerbot/vars"
@@ -99,6 +100,21 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
+	// email validate
+	if len(u.Email) == 0 || (!u.IsVerify) {
+
+		// send reg message
+		_, _ = RetrySendMessage(u.ChatID, vars.RegTipMessage, emptyOpts)
+
+		// send email enter msg
+		_, _ = RetrySendMessage(u.ChatID, vars.NeedInputEmailMessage, emptyOpts)
+
+		// update email and is_wait_input_email
+		updateUserIsWaitInputEmail(u.ID, true)
+
+		return true
+	}
+
 	db.Exec("UPDATE users SET available = 1 WHERE chat_id = ?", u.ChatID)
 
 	_, _ = RetrySendMessage(u.ChatID, vars.StartMatchingMessage, emptyOpts)
@@ -166,6 +182,78 @@ func commandReport(u User, m *tgbotapi.Message) bool {
 func commandMessage(u User, m *tgbotapi.Message) bool {
 
 	if !u.Available {
+
+		// users email verify
+		if !u.IsVerify {
+
+			// if user input new email
+			if err := OTPMasterIns.Emailer.ValidateAddress(m.Text); err == nil {
+
+				// update user email
+				email := m.Text
+
+				// valid email white
+				ok, err := service.ServiceValidWhiteEmail(nil, email)
+				if err != nil {
+					_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+					return false
+				}
+
+				if !ok {
+					_, _ = RetrySendMessage(u.ChatID, vars.NotAccessRegisterMessage, emptyOpts)
+					return false
+				}
+
+				// send valid code email
+				if err := OTPMasterIns.SendOTP(email, email); err != nil {
+					// send mail format error
+					_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+					return false
+				}
+
+				// update user email
+				if err := updateUserEmail(u.ID, email); err != nil {
+					_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+					return false
+				}
+
+				_, _ = RetrySendMessage(u.ChatID, vars.SendEmailCodeMessage, emptyOpts)
+
+				return false
+			}
+
+			if len(u.Email) == 0 {
+				_, _ = RetrySendMessage(u.ChatID, vars.NeedInputEmailMessage, emptyOpts)
+				return false
+			}
+
+			otpVal := m.Text
+
+			// if user input code
+			_, err := OTPMasterIns.VerifyOTP(u.Email, otpVal)
+			if err != nil {
+				if err == otpgateway.ErrNotExist {
+					_, _ = RetrySendMessage(u.ChatID, vars.OTPNoExistsMessage, emptyOpts)
+					return false
+				}
+
+				if err.Error() == "OTP does not match" {
+					_, _ = RetrySendMessage(u.ChatID, vars.OTPFailMessage, emptyOpts)
+					return false
+				}
+
+				_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+				return false
+			}
+
+			if err := updateUserEmailVerify(u.ID); err != nil {
+				_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+				return false
+			}
+
+			_, _ = RetrySendMessage(u.ChatID, vars.OTPSuccessMessage, emptyOpts)
+		}
+
 		return false
 	}
 

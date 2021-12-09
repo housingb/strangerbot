@@ -1,0 +1,58 @@
+[Telegram]
+# Application Name
+Namespace = "MyApp"
+# Secret Token for OTP
+Secret = "mySecretToken"
+# Telegram Bot Key Input Here
+BotKey = "Telegram Bot Key"
+
+# Bot Program DB Connect Info
+[MysqlDB]
+Host = "127.0.0.1"
+Port = 3306
+Username = "root"
+Password = "root"
+DBName = "strangerbot"
+# The following configuration can be left unchanged
+Charset = "utf8"
+MaxOpenConns = 1000
+MaxIdleConns = 1000
+ConnMaxLifetime = 10
+
+# OTP Redis Conf
+[RedisConf]
+Host = "127.0.0.1"
+Port = "6379"
+Username = ""
+Password = ""
+MaxActive = 100
+MaxIdle = 10
+TimeoutSeconds = 10
+KeyPrefix = "OTP"
+
+[OTPConf]
+# otp time to live seconds
+OTPTTL = 300
+
+[EmailOTP]
+# email subject
+Subject = "MyApp Email verification"
+# email send template
+Template = "static/smtp.tpl"
+# email template type default:html
+TemplateType = "html"
+# email smtp config
+Config = '''
+    {
+        "sHost": "you.smtp.host",
+        "sPort": 25,
+        "Host": "localhost",
+        "Port": 25,
+        "AuthProtocol": "cram",
+        "User": "smtp-user",
+        "Password": "smtp-password",
+        "FromEmail": "OTP verification <yoursite@yoursite.com>",
+        "MaxConns": 10,
+        "Sendtimeout": 5
+    }
+'''

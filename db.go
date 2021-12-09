@@ -9,18 +9,6 @@ import (
 
 var DB *gorm.DB
 
-type Database struct {
-	Host            string
-	Port            int
-	Username        string
-	Password        string
-	DBName          string
-	Charset         string
-	MaxOpenConns    int
-	MaxIdleConns    int
-	ConnMaxLifetime int64
-}
-
 func InitDB(cfg Database) error {
 
 	// db conn

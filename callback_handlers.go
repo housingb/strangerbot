@@ -183,3 +183,17 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	//}
 
 }
+
+func updateUserIsWaitInputEmail(id int64, isWait bool) {
+	db.Exec("UPDATE users SET is_wait_input_email = ? WHERE id = ?", isWait, id)
+}
+
+func updateUserEmail(id int64, email string) error {
+	_, err := db.Exec("UPDATE users SET email = ? WHERE id = ?", email, id)
+	return err
+}
+
+func updateUserEmailVerify(id int64) error {
+	_, err := db.Exec("UPDATE users SET is_verify = 1 WHERE id = ?", id)
+	return err
+}
