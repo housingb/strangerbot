@@ -7,6 +7,12 @@ users and allows them to chat with each other.
 # License
 StrangerBot is licensed under the Apache 2.0 license.
 
+# Depends
+
+* Golang
+* Mysql
+* Redis
+
 # Installation
 Currently there are no binaries available as direct download yet, you should
 build it yourself using Go.
