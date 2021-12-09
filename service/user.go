@@ -89,3 +89,19 @@ func shuffleChatId(a []int64) int64 {
 	}
 	return a[0]
 }
+
+func ServiceCheckEmailUnique(ctx context.Context, email string) error {
+
+	repo := repository.GetRepository()
+
+	cnt, err := repo.GetEmailCnt(ctx, email)
+	if err != nil {
+		return err
+	}
+
+	if cnt > 0 {
+		return errors.New("Sorry, This email has already been registered.")
+	}
+
+	return nil
+}

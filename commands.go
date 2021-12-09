@@ -192,6 +192,12 @@ func commandMessage(u User, m *tgbotapi.Message) bool {
 				// update user email
 				email := m.Text
 
+				// check email unique
+				if err := service.ServiceCheckEmailUnique(nil, email); err != nil {
+					_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+					return false
+				}
+
 				// valid email white
 				ok, err := service.ServiceValidWhiteEmail(nil, email)
 				if err != nil {
@@ -242,6 +248,12 @@ func commandMessage(u User, m *tgbotapi.Message) bool {
 					return false
 				}
 
+				_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
+				return false
+			}
+
+			// check email unique
+			if err := service.ServiceCheckEmailUnique(nil, u.Email); err != nil {
 				_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
 				return false
 			}

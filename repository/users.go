@@ -44,3 +44,20 @@ func (p *Repository) GetUserByChatId(ctx context.Context, chatId int64) (*model.
 
 	return po, nil
 }
+
+func (p *Repository) GetEmailCnt(ctx context.Context, email string) (int64, error) {
+
+	var cnt struct{ Cnt int64 }
+
+	err := p.db.Select("COUNT(*) AS cnt").Where("email = ? AND is_verify = 1", email).Model(model.User{}).Scan(&cnt).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return 0, nil
+	}
+
+	if err != nil {
+		return 0, err
+	}
+
+	return cnt.Cnt, nil
+}
