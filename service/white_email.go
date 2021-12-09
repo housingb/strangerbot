@@ -23,10 +23,6 @@ func ServiceValidWhiteEmail(ctx context.Context, email string) (bool, error) {
 		}
 	}
 
-	if domain {
-		return true, nil
-	}
-
 	emailW := false
 	if vars.WhiteEmailEnabled {
 
@@ -44,15 +40,12 @@ func ServiceValidWhiteEmail(ctx context.Context, email string) (bool, error) {
 		}
 	}
 
-	//if vars.WhiteDomainEnabled && vars.WhiteEmailEnabled {
-	//	if domain && emailW {
-	//		return true, nil
-	//	}
-	//	return false, nil
-	//}
-	if emailW {
-		return true, nil
+	if vars.WhiteDomainEnabled && vars.WhiteEmailEnabled {
+		if domain && emailW {
+			return true, nil
+		}
+		return false, nil
 	}
 
-	return false, nil
+	return true, nil
 }
