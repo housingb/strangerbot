@@ -88,4 +88,39 @@ You can then run start StrangerBot by running `strangerbot` in your terminal.
 | sort | 0 | order by sort asc |
 | row_index | 0 | same row index will be inline |
 
+# WhiteList
 
+## White Domain
+
+1. edit config file
+```
+vi ./config/app.toml
+```
+2. set WhiteDomainEnabled as true
+```
+WhiteDomainEnabled = true
+```
+3. edit white email domain
+```
+WhiteDomain = "@a.com,@b.com,@c.com"
+```
+> multi domain use Comma separated
+
+## White Email
+
+1. edit config file
+```
+vi ./config/app.toml
+```
+2. set WhiteEmailEnabled as true
+```
+WhiteEmailEnabled = false
+```
+3. add white email domain mysql table.
+    1. login mysql console.
+    2. choose db: ```use bot2;```
+    3. run INSERT command
+        ```
+            INSERT INTO `bot2`.`e_email_whitelist` (`id`, `email`) VALUES (1, 'test@a.com');
+        ```
+       > test@a.com is white email.
