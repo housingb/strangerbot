@@ -92,12 +92,12 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	isFull, err := service.ServiceCheckUserFillFull(nil, u.ChatID)
 	if err != nil {
 		log.Println(err.Error())
-		return false
+		return true
 	}
 
 	if !isFull {
 		_, _ = RetrySendMessage(u.ChatID, vars.NotProfileFinishMessage, emptyOpts)
-		return false
+		return true
 	}
 
 	// email validate
