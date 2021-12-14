@@ -45,6 +45,13 @@ func ServiceValidWhiteEmail(ctx context.Context, email string) (bool, error) {
 			return true, nil
 		}
 		return false, nil
+	} else {
+		if vars.WhiteDomainEnabled || vars.WhiteEmailEnabled {
+			if domain || emailW {
+				return true, nil
+			}
+			return false, nil
+		}
 	}
 
 	return true, nil
