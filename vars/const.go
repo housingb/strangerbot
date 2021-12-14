@@ -2,7 +2,7 @@ package vars
 
 var (
 	// debug or prod
-	RUN_MODE = "debug"
+	RUN_MODE = "prod"
 )
 
 const (
