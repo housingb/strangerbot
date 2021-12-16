@@ -72,7 +72,7 @@ func (p *Repository) GetVerifyUser(ctx context.Context, chatIds []int64, isVerif
 
 	rs := make([]int64, 0, len(list))
 	for _, item := range list {
-		rs = append(rs, item.ID)
+		rs = append(rs, item.ChatID)
 	}
 
 	return rs, nil
