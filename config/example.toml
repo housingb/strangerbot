@@ -67,3 +67,17 @@ Config = '''
         "Sendtimeout": 5
     }
 '''
+
+[VerifyProfileConf]
+# profile question id
+ProfileQuestionId = 8
+# verify option id
+VerifyOptionId = 27
+
+[VerifyMatchingConf]
+# matching verify question id
+MatchingQuestionId = 0
+# verified option id
+VerifiedOptionId = 0
+# unverified option id
+UnverifiedOptionId = 0
