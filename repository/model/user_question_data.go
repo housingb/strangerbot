@@ -43,3 +43,14 @@ func (u UserQuestionDataList) GetOptionIds() []int64 {
 
 	return rs
 }
+
+func (u UserQuestionDataList) GetFirstOptionIdByQuestionId(questionId int64) int64 {
+
+	for _, item := range u {
+		if item.QuestionId == questionId {
+			return item.OptionId
+		}
+	}
+
+	return 0
+}

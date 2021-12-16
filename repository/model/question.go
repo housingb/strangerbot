@@ -6,6 +6,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/repository/gorm_global"
+	"strangerbot/vars"
 )
 
 const (
@@ -117,6 +118,11 @@ func (q Questions) CheckUserFillFull(userData []*UserQuestionData) (bool, []*Que
 
 	rs := make([]*Question, 0, len(q))
 	for i, item := range q {
+
+		if item.ID == vars.VerifyProfileQuestionId {
+			continue
+		}
+
 		found := false
 		for _, fill := range userData {
 			if fill.QuestionId == item.ID {

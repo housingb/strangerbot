@@ -103,6 +103,9 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	// email validate
 	if len(u.Email) == 0 || (!u.IsVerify) {
 
+		_, _ = RetrySendMessage(u.ChatID, vars.NotProfileFinishMessage, emptyOpts)
+		return true
+
 		// send reg message
 		_, _ = RetrySendMessage(u.ChatID, vars.RegTipMessage, emptyOpts)
 

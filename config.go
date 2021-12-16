@@ -9,12 +9,14 @@ import (
 )
 
 type ConfigParser struct {
-	Telegram  Telegram
-	WhiteList WhiteList
-	MysqlDB   Database
-	RedisConf RedisConf
-	OTPConf   OTPConf
-	EmailOTP  EmailOTP
+	Telegram           Telegram
+	WhiteList          WhiteList
+	MysqlDB            Database
+	RedisConf          RedisConf
+	OTPConf            OTPConf
+	EmailOTP           EmailOTP
+	VerifyProfileConf  VerifyProfileConf
+	VerifyMatchingConf VerifyMatchingConf
 }
 
 type WhiteList struct {
@@ -63,6 +65,19 @@ type Database struct {
 	MaxOpenConns    int
 	MaxIdleConns    int
 	ConnMaxLifetime int64
+}
+
+type VerifyProfileConf struct {
+	ProfileQuestionId    int64
+	VerifyOptionId       int64
+	RemainVerifyOptionId int64
+}
+
+type VerifyMatchingConf struct {
+	MatchingQuestionId int64
+	VerifiedOptionId   int64
+	UnverifiedOptionId int64
+	AnyOptionId        int64
 }
 
 // 加载配置

@@ -83,6 +83,14 @@ func main() {
 	vars.WhiteDomain = cfg.WhiteList.WhiteDomain
 	vars.WhiteEmailEnabled = cfg.WhiteList.WhiteEmailEnabled
 
+	vars.VerifyProfileQuestionId = cfg.VerifyProfileConf.ProfileQuestionId
+	vars.VerifyOptionId = cfg.VerifyProfileConf.VerifyOptionId
+
+	vars.MatchingQuestionId = cfg.VerifyMatchingConf.MatchingQuestionId
+	vars.MatchingVerifiedOptionId = cfg.VerifyMatchingConf.VerifiedOptionId
+	vars.MatchingUnverifiedOptionId = cfg.VerifyMatchingConf.UnverifiedOptionId
+	//vars.MatchingAnyOptionId = cfg.VerifyMatchingConf.AnyOptionId
+	
 	// init gorm db
 	if err := InitDB(cfg.MysqlDB); err != nil {
 		panic(err)

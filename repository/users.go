@@ -61,3 +61,19 @@ func (p *Repository) GetEmailCnt(ctx context.Context, email string) (int64, erro
 
 	return cnt.Cnt, nil
 }
+
+func (p *Repository) GetVerifyUser(ctx context.Context, chatIds []int64, isVerify bool) ([]int64, error) {
+
+	var list []*model.User
+	err := p.db.Where("chat_id IN(?) AND is_verify = ?", chatIds, isVerify).Find(&list).Error
+	if err != nil {
+		return nil, err
+	}
+
+	rs := make([]int64, 0, len(list))
+	for _, item := range list {
+		rs = append(rs, item.ID)
+	}
+
+	return rs, nil
+}

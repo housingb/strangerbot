@@ -135,6 +135,10 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 			continue
 		}
 
+		if option.QuestionId == vars.MatchingQuestionId {
+			continue
+		}
+
 		allMatchingOptions = append(allMatchingOptions, option.MatchingOptionId)
 		if _, ok := questionMatchingMap[item.QuestionId]; !ok {
 			questionMatchingMap[item.QuestionId] = true
@@ -152,6 +156,10 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 		}
 
 		if option.MatchingOptionId == 0 {
+			continue
+		}
+
+		if option.QuestionId == vars.VerifyProfileQuestionId {
 			continue
 		}
 

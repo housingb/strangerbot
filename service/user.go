@@ -7,6 +7,7 @@ import (
 
 	"strangerbot/repository"
 	"strangerbot/repository/model"
+	"strangerbot/vars"
 )
 
 var (
@@ -68,6 +69,26 @@ func ServiceMatch(ctx context.Context, chatId int64) (*model.User, error) {
 
 	if len(chatIds) == 0 {
 		return nil, nil
+	}
+
+	// verified user matching
+	userDataList := model.UserQuestionDataList(userQuestionData)
+	vMOI := userDataList.GetFirstOptionIdByQuestionId(vars.MatchingQuestionId)
+	switch vMOI {
+	case vars.MatchingVerifiedOptionId:
+
+		chatIds, err = repo.GetVerifyUser(ctx, chatIds, true)
+		if err != nil {
+			return nil, err
+		}
+
+	case vars.MatchingUnverifiedOptionId:
+
+		chatIds, err = repo.GetVerifyUser(ctx, chatIds, false)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 
 	// shuffle chat id

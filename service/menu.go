@@ -10,7 +10,7 @@ import (
 	"strangerbot/vars"
 )
 
-func ServiceMenu(ctx context.Context, chatId int64, data *keyboard.KeyboardCallbackDataPlus) ([]*tgbotapi.MessageConfig, error) {
+func ServiceMenu(ctx context.Context, chatId int64, data *keyboard.KeyboardCallbackDataPlus, userVerify bool) ([]*tgbotapi.MessageConfig, error) {
 
 	repo := repository.GetRepository()
 	menu, err := repo.GetMenu(ctx, data.ButtonRelId)
@@ -67,12 +67,25 @@ func ServiceMenu(ctx context.Context, chatId int64, data *keyboard.KeyboardCallb
 			return nil, err
 		}
 
-		msgs := make([]*tgbotapi.MessageConfig, 0, 2)
-		if len(question.HelperText) > 0 {
-			msg := tgbotapi.NewMessage(chatId, question.HelperText)
-			msg.ParseMode = "Markdown"
-			msgs = append(msgs, &msg)
+		if question.ID == vars.VerifyProfileQuestionId {
+			if userVerify {
+				userQuestionData = []*model.UserQuestionData{
+					{
+						ChatId:     chatId,
+						QuestionId: question.ID,
+						OptionId:   vars.VerifyOptionId,
+						Value:      "",
+					},
+				}
+			}
 		}
+
+		msgs := make([]*tgbotapi.MessageConfig, 0, 2)
+		//if len(question.HelperText) > 0 {
+		//	msg := tgbotapi.NewMessage(chatId, question.HelperText)
+		//	msg.ParseMode = "Markdown"
+		//	msgs = append(msgs, &msg)
+		//}
 
 		msg := tgbotapi.NewMessage(chatId, question.GetHelperMessage())
 		msg.ParseMode = "Markdown"

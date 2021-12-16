@@ -48,13 +48,43 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	)
 	switch data.ButtonType {
 	case keyboard.BUTTON_TYPE_MENU:
-		msgs, err = service.ServiceMenu(ctx, callbackQuery.Message.Chat.ID, data)
+
+		msgs, err = service.ServiceMenu(ctx, callbackQuery.Message.Chat.ID, data, u.IsVerify)
 		if err != nil {
 			return
 		}
+
 	case keyboard.BUTTON_TYPE_QUESTION:
 
 	case keyboard.BUTTON_TYPE_OPTION:
+
+		switch data.ButtonRelId {
+
+		case vars.VerifyOptionId:
+
+			// email validate
+			if len(u.Email) == 0 || (!u.IsVerify) {
+
+				// first delete pre msg
+				{
+					msg := tgbotapi.NewDeleteMessage(callbackQuery.Message.Chat.ID, callbackQuery.Message.MessageID)
+					_, err = telegramBot.Send(msg)
+					if err != nil {
+						return
+					}
+				}
+
+				// send email enter msg
+				_, _ = RetrySendMessage(u.ChatID, vars.NeedInputEmailMessage, emptyOpts)
+
+				// update email and is_wait_input_email
+				updateUserIsWaitInputEmail(u.ID, true)
+			}
+
+			return
+
+		}
+
 		msgs, cbs, err = service.ServiceQuestionOption(ctx, callbackQuery.Message.Chat.ID, data)
 		if err != nil {
 			return
