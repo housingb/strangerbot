@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 	"math/rand"
 
 	"strangerbot/repository"
@@ -71,6 +72,8 @@ func ServiceMatch(ctx context.Context, chatId int64, isVerify bool) (*model.User
 		return nil, nil
 	}
 
+	log.Printf("chat_id: %d matching chat ids: %v \n", chatId, chatIds)
+
 	// verified user matching
 	userDataList := model.UserQuestionDataList(userQuestionData)
 	vMOI := userDataList.GetFirstOptionIdByQuestionId(vars.MatchingQuestionId)
@@ -91,6 +94,8 @@ func ServiceMatch(ctx context.Context, chatId int64, isVerify bool) (*model.User
 
 	}
 
+	log.Printf("chat_id: %d verified matching chat ids: %v \n", chatId, chatIds)
+
 	if isVerify {
 		chatIds, err = repo.CheckHasOptionBy(ctx, chatIds, []int64{vars.MatchingVerifiedOptionId, vars.MatchingAnyOptionId})
 		if err != nil {
@@ -102,6 +107,8 @@ func ServiceMatch(ctx context.Context, chatId int64, isVerify bool) (*model.User
 			return nil, err
 		}
 	}
+
+	log.Printf("chat_id: %d CheckHasOptionBy chat ids: %v \n", chatId, chatIds)
 
 	if len(chatIds) == 0 {
 		return nil, nil
