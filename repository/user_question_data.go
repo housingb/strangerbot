@@ -187,7 +187,7 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 		sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE option_id IN(?) AND chat_id IN((SELECT chat_id FROM users WHERE chat_id != ? AND available = 1 AND match_chat_id IS NULL)) GROUP BY chat_id,question_id) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", allMatchingOptions, chatId, matchingQuestionNum)
 	}
 
-	sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(*) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE chat_id IN(?) AND option_id IN(?)) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", sub.QueryExpr(), allProfileMatchingOptions, profileMatchingQuestionNum)
+	sub = p.db.Raw("SELECT chat_id FROM (SELECT chat_id,COUNT(DISTINCT question_id) AS cnt FROM (SELECT chat_id,question_id FROM bot_user_question_data WHERE chat_id IN(?) AND option_id IN(?)) AS bot_user_question_data GROUP BY chat_id) AS bot_user_question_data WHERE cnt = ?", sub.QueryExpr(), allProfileMatchingOptions, profileMatchingQuestionNum)
 
 	var data []struct {
 		ChatId int64
