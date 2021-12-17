@@ -205,6 +205,10 @@ func commandMessage(u User, m *tgbotapi.Message) bool {
 		// users email verify
 		if !u.IsVerify {
 
+			if len(m.Text) == 0 {
+				return true
+			}
+
 			// if user input new email
 			if err := OTPMasterIns.Emailer.ValidateAddress(m.Text); err == nil {
 
