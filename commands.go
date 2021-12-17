@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -193,6 +194,11 @@ func commandReport(u User, m *tgbotapi.Message) bool {
 }
 
 func commandMessage(u User, m *tgbotapi.Message) bool {
+
+	if m.Text == "DEBUG_GIVE_ME_CHAT_ID" {
+		_, _ = RetrySendMessage(u.ChatID, fmt.Sprintf("CHAT_ID: %d", u.ChatID), emptyOpts)
+		return true
+	}
 
 	if !u.Available {
 
