@@ -89,7 +89,7 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
-	isFull, err := service.ServiceCheckUserFillFull(nil, u.ChatID)
+	isFull, err := service.ServiceCheckUserFillFull(nil, u.ChatID, u.IsVerify)
 	if err != nil {
 		log.Println(err.Error())
 		return true

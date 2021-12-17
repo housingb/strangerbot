@@ -114,13 +114,15 @@ func (q Questions) GetMappingQuestion(matchingQuestion []*Question) []*Question 
 	return rs
 }
 
-func (q Questions) CheckUserFillFull(userData []*UserQuestionData) (bool, []*Question) {
+func (q Questions) CheckUserFillFull(userData []*UserQuestionData, isVerify bool) (bool, []*Question) {
 
 	rs := make([]*Question, 0, len(q))
 	for i, item := range q {
 
 		if item.ID == vars.VerifyProfileQuestionId {
-			continue
+			if isVerify {
+				continue
+			}
 		}
 
 		found := false

@@ -14,7 +14,7 @@ var (
 	ErrUserNotFillAllQuestion = errors.New("user not fill all question")
 )
 
-func ServiceCheckUserFillFull(ctx context.Context, chatId int64) (bool, error) {
+func ServiceCheckUserFillFull(ctx context.Context, chatId int64, isVerify bool) (bool, error) {
 
 	repo := repository.GetRepository()
 
@@ -31,7 +31,7 @@ func ServiceCheckUserFillFull(ctx context.Context, chatId int64) (bool, error) {
 	}
 
 	// check user fill full
-	fillFull, _ := model.Questions(questions).CheckUserFillFull(userQuestionData)
+	fillFull, _ := model.Questions(questions).CheckUserFillFull(userQuestionData, isVerify)
 	if fillFull {
 		return true, nil
 	}
@@ -39,7 +39,7 @@ func ServiceCheckUserFillFull(ctx context.Context, chatId int64) (bool, error) {
 	return false, nil
 }
 
-func ServiceMatch(ctx context.Context, chatId int64) (*model.User, error) {
+func ServiceMatch(ctx context.Context, chatId int64, isVerify bool) (*model.User, error) {
 
 	repo := repository.GetRepository()
 
@@ -89,6 +89,22 @@ func ServiceMatch(ctx context.Context, chatId int64) (*model.User, error) {
 			return nil, err
 		}
 
+	}
+
+	if isVerify {
+		chatIds, err = repo.CheckHasOptionBy(ctx, chatIds, []int64{vars.MatchingVerifiedOptionId, vars.MatchingAnyOptionId})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		chatIds, err = repo.CheckHasOptionBy(ctx, chatIds, []int64{vars.MatchingUnverifiedOptionId, vars.MatchingAnyOptionId})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if len(chatIds) == 0 {
+		return nil, nil
 	}
 
 	// shuffle chat id

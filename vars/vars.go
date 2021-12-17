@@ -13,4 +13,5 @@ var (
 	MatchingQuestionId         int64
 	MatchingVerifiedOptionId   int64
 	MatchingUnverifiedOptionId int64
+	MatchingAnyOptionId        int64
 )

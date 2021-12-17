@@ -89,8 +89,8 @@ func main() {
 	vars.MatchingQuestionId = cfg.VerifyMatchingConf.MatchingQuestionId
 	vars.MatchingVerifiedOptionId = cfg.VerifyMatchingConf.VerifiedOptionId
 	vars.MatchingUnverifiedOptionId = cfg.VerifyMatchingConf.UnverifiedOptionId
-	//vars.MatchingAnyOptionId = cfg.VerifyMatchingConf.AnyOptionId
-	
+	vars.MatchingAnyOptionId = cfg.VerifyMatchingConf.AnyOptionId
+
 	// init gorm db
 	if err := InitDB(cfg.MysqlDB); err != nil {
 		panic(err)

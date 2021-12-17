@@ -207,3 +207,26 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 
 	return rs, userMatchingData, nil
 }
+
+func (p *Repository) CheckHasOptionBy(ctx context.Context, chatIds []int64, optionIds []int64) ([]int64, error) {
+
+	q := p.db.Where("chat_id IN(?) AND option_id IN(?) AND is_del = 0", chatIds, optionIds).Group("chat_id")
+
+	var list []*model.UserQuestionData
+
+	if err := q.Model(&model.UserQuestionData{}).Find(&list).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	rs := make([]int64, 0, len(list))
+
+	for _, item := range list {
+		rs = append(rs, item.ChatId)
+	}
+
+	return rs, nil
+}

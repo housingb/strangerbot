@@ -30,7 +30,7 @@ func matchUsers(chatIDs <-chan int64) {
 			continue
 		}
 
-		matchUser, err := service.ServiceMatch(ctx, user.ChatID)
+		matchUser, err := service.ServiceMatch(ctx, user.ChatID, user.IsVerify)
 		if err != nil {
 			log.Printf("Error retrieving available users: %s", err)
 			continue
