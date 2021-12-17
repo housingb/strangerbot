@@ -103,19 +103,29 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	// email validate
 	if len(u.Email) == 0 || (!u.IsVerify) {
 
-		_, _ = RetrySendMessage(u.ChatID, vars.NotProfileFinishMessage, emptyOpts)
-		return true
+		repo := repository.GetRepository()
 
-		// send reg message
-		_, _ = RetrySendMessage(u.ChatID, vars.RegTipMessage, emptyOpts)
+		opts, err := repo.GetUserQuestionDataByUserQuestion(context.TODO(), u.ChatID, vars.VerifyProfileQuestionId)
+		if err != nil {
+			log.Println(err.Error())
+			return true
+		}
 
-		// send email enter msg
-		_, _ = RetrySendMessage(u.ChatID, vars.NeedInputEmailMessage, emptyOpts)
+		if len(opts) == 0 {
+			_, _ = RetrySendMessage(u.ChatID, vars.NotProfileFinishMessage, emptyOpts)
+			return true
+		}
 
-		// update email and is_wait_input_email
-		updateUserIsWaitInputEmail(u.ID, true)
-
-		return true
+		//// send reg message
+		//_, _ = RetrySendMessage(u.ChatID, vars.RegTipMessage, emptyOpts)
+		//
+		//// send email enter msg
+		//_, _ = RetrySendMessage(u.ChatID, vars.NeedInputEmailMessage, emptyOpts)
+		//
+		//// update email and is_wait_input_email
+		//updateUserIsWaitInputEmail(u.ID, true)
+		//
+		//return true
 	}
 
 	db.Exec("UPDATE users SET available = 1 WHERE chat_id = ?", u.ChatID)
