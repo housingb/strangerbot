@@ -210,7 +210,7 @@ func (p *Repository) GetChatByMatching(ctx context.Context, chatId int64, questi
 
 func (p *Repository) CheckHasOptionBy(ctx context.Context, chatIds []int64, optionIds []int64) ([]int64, error) {
 
-	q := p.db.Where("chat_id IN(?) AND option_id IN(?) AND is_del = 0", chatIds, optionIds).Group("chat_id")
+	q := p.db.Where("chat_id IN(?) AND option_id IN(?) AND is_del = 0", chatIds, optionIds)
 
 	var list []*model.UserQuestionData
 
@@ -223,9 +223,15 @@ func (p *Repository) CheckHasOptionBy(ctx context.Context, chatIds []int64, opti
 	}
 
 	rs := make([]int64, 0, len(list))
-
+	rsMap := make(map[int64]bool, len(list))
 	for _, item := range list {
+
+		if _, ok := rsMap[item.ChatId]; ok {
+			continue
+		}
+
 		rs = append(rs, item.ChatId)
+		rsMap[item.ChatId] = true
 	}
 
 	return rs, nil
