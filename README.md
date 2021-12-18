@@ -24,27 +24,100 @@ If you have go installed, you can install strangerbot like this:
 # How Run?
 
 1. cd /root/go/src/strangerbot dir
-2. run 'go install .'
-3. cd /root/go/bin
-4. modify start.sh,edit telegram bot key
-5. sh start.sh
+2. run command "go build ."
+3. edit config file, run command "vi ./config/app.toml"
+4. run command "nohup ./strangerbot > /dev/null 2>&1 &"
+5. run command "ps -ef | grep strangerbot" check process is running
 
-# Usage
+# config/app.toml
 
-Make sure you have MySQL installed, and retrieved an API key from Telegram.
+```toml
+[Telegram]
+# Application Name
+Namespace = "MyApp"
+# Secret Token for OTP,Random 32-bit string e.g: blwPphsuyer3O1QgXe0sy1d3M0ZXzRZl
+Secret = "mySecretToken"
+# Telegram Bot Key Input Here
+BotKey = "Telegram Bot Key"
 
-## Example
+[WhiteList]
+# white email domain enabled
+WhiteDomainEnabled = true
+# white email domain list
+WhiteDomain = "@qq.com,@hotmail.com"
+# white email list enabled , email list read from db
+WhiteEmailEnabled = true
 
-Make sure you have the following environment variables set:
+# Bot Program DB Connect Info
+[MysqlDB]
+Host = "127.0.0.1"
+Port = 3306
+Username = "root"
+Password = "root"
+DBName = "strangerbot"
+# The following configuration can be left unchanged
+Charset = "utf8"
+MaxOpenConns = 1000
+MaxIdleConns = 1000
+ConnMaxLifetime = 10
 
+# OTP Redis Conf
+[RedisConf]
+Host = "127.0.0.1"
+Port = "6379"
+Username = ""
+Password = ""
+MaxActive = 100
+MaxIdle = 10
+TimeoutSeconds = 10
+KeyPrefix = "OTP"
+
+[OTPConf]
+# otp time to live seconds
+OTPTTL = 300
+# otp max attempts
+OTPMaxAttempts = 500
+# otp len
+OTPMaxLen = 6
+
+[EmailOTP]
+# email subject
+Subject = "MyApp Email verification"
+# email send template
+Template = "static/smtp.tpl"
+# email template type default:html
+TemplateType = "html"
+# email smtp config
+Config = '''
+    {
+        "Host": "smtp.sendgrid.net",
+        "Port": 25,
+        "AuthProtocol": "",
+        "AuthProtocol": "cram",
+        "User": "smtp-user",
+        "Password": "smtp-password",
+        "FromEmail": "OTP verification <yoursite@yoursite.com>",
+        "MaxConns": 10,
+        "Sendtimeout": 5
+    }
+'''
+
+[VerifyProfileConf]
+# profile question id
+ProfileQuestionId = 8
+# verify option id
+VerifyOptionId = 27
+
+[VerifyMatchingConf]
+# matching verify question id
+MatchingQuestionId = 0
+# verified option id
+VerifiedOptionId = 0
+# unverified option id
+UnverifiedOptionId = 0
+# anything option id
+AnyOptionId = 0
 ```
-MYSQL_USER
-MYSQL_PASSWORD
-MYSQL_DATABASE
-TELEGRAM_BOT_KEY
-```
-
-You can then run start StrangerBot by running `strangerbot` in your terminal.
 
 ## Menu configuration
 
