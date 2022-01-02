@@ -33,6 +33,7 @@ If you require any help, feel free to contact @aaldentnay !`
 	OTPFailMessage           = `Code is not match,Please re-enter email or code.`
 	OTPSuccessMessage        = `Register Success! Please click /start to match.`
 	NotAccessRegisterMessage = `Sorry, you do not have the authorization to register.`
+	RetryInputEmailMessage   = `Mail service send failed, Please re-enter email.`
 )
 
 // emoji UTF-8 from https://apps.timwhitlock.info/emoji/tables/unicode

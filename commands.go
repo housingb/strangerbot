@@ -234,10 +234,14 @@ func commandMessage(u User, m *tgbotapi.Message) bool {
 				}
 
 				// send valid code email
-				if err := OTPMasterIns.SendOTP(email, email); err != nil {
-					// send mail format error
-					_, _ = RetrySendMessage(u.ChatID, err.Error(), emptyOpts)
-					return false
+				for i := 0; i < 3; i++ {
+					if err := OTPMasterIns.SendOTP(email, email); err != nil {
+						if i == 2 {
+							// send mail format error
+							_, _ = RetrySendMessage(u.ChatID, vars.RetryInputEmailMessage, emptyOpts)
+							return false
+						}
+					}
 				}
 
 				// update user email
