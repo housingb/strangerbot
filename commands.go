@@ -241,6 +241,8 @@ func commandMessage(u User, m *tgbotapi.Message) bool {
 							_, _ = RetrySendMessage(u.ChatID, vars.RetryInputEmailMessage, emptyOpts)
 							return false
 						}
+					} else {
+						break
 					}
 				}
 
