@@ -125,16 +125,20 @@ OptionId = 2
 RateLimitEnabled = true
 # rate limit unit only support "day"
 RateLimitUnit = "day"
+# rate limit unit period, don't change this value.
+RateLimitUnitPeriod = 7
 # match per rate
-MatchPerRate = 2
+MatchPerRate = 1
 
 [MaleMatchRateLimit]
 # male option id
-OptionId = 3
+OptionId = 1
 # rate limit endabled
 RateLimitEnabled = true
 # rate limit unit only support "day"
 RateLimitUnit = "day"
+# rate limit unit period, don't change this value.
+RateLimitUnitPeriod = 7
 # match per rate
 MatchPerRate = 2
 ```
@@ -230,16 +234,20 @@ OptionId = 2
 RateLimitEnabled = true
 # rate limit unit only support "day"
 RateLimitUnit = "day"
+# rate limit unit period, don't change this value.
+RateLimitUnitPeriod = 7
 # match per rate
-MatchPerRate = 2
+MatchPerRate = 1
 
 [MaleMatchRateLimit]
 # male option id
-OptionId = 3
+OptionId = 1
 # rate limit endabled
 RateLimitEnabled = true
 # rate limit unit only support "day"
 RateLimitUnit = "day"
+# rate limit unit period, don't change this value.
+RateLimitUnitPeriod = 7
 # match per rate
 MatchPerRate = 2
 ```
