@@ -14,4 +14,15 @@ var (
 	MatchingVerifiedOptionId   int64
 	MatchingUnverifiedOptionId int64
 	MatchingAnyOptionId        int64
+
+	FemaleMatchRateLimit MatchRateLimit
+	MaleMatchRateLimit   MatchRateLimit
 )
+
+type MatchRateLimit struct {
+	OptionId            int64
+	RateLimitEnabled    bool
+	RateLimitUnit       string
+	RateLimitUnitPeriod int64
+	MatchPerRate        int64
+}

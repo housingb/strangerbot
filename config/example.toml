@@ -83,3 +83,23 @@ VerifiedOptionId = 0
 UnverifiedOptionId = 0
 # anything option id
 AnyOptionId = 0
+
+[FemaleMatchRateLimit]
+# female option id
+OptionId = 2
+# rate limit endabled
+RateLimitEnabled = true
+# rate limit unit only support "week"
+RateLimitUnit = "week"
+# match per rate
+MatchPerRate = 2
+
+[MaleMatchRateLimit]
+# male option id
+OptionId = 3
+# rate limit endabled
+RateLimitEnabled = true
+# rate limit unit only support "week"
+RateLimitUnit = "week"
+# match per rate
+MatchPerRate = 2

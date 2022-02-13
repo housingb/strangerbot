@@ -91,6 +91,21 @@ func main() {
 	vars.MatchingUnverifiedOptionId = cfg.VerifyMatchingConf.UnverifiedOptionId
 	vars.MatchingAnyOptionId = cfg.VerifyMatchingConf.AnyOptionId
 
+	vars.FemaleMatchRateLimit = vars.MatchRateLimit{
+		OptionId:            cfg.FemaleMatchRateLimit.OptionId,
+		RateLimitEnabled:    cfg.FemaleMatchRateLimit.RateLimitEnabled,
+		RateLimitUnit:       cfg.FemaleMatchRateLimit.RateLimitUnit,
+		RateLimitUnitPeriod: cfg.FemaleMatchRateLimit.RateLimitUnitPeriod,
+		MatchPerRate:        cfg.FemaleMatchRateLimit.MatchPerRate,
+	}
+	vars.MaleMatchRateLimit = vars.MatchRateLimit{
+		OptionId:            cfg.MaleMatchRateLimit.OptionId,
+		RateLimitEnabled:    cfg.MaleMatchRateLimit.RateLimitEnabled,
+		RateLimitUnit:       cfg.MaleMatchRateLimit.RateLimitUnit,
+		RateLimitUnitPeriod: cfg.MaleMatchRateLimit.RateLimitUnitPeriod,
+		MatchPerRate:        cfg.MaleMatchRateLimit.MatchPerRate,
+	}
+
 	// init gorm db
 	if err := InitDB(cfg.MysqlDB); err != nil {
 		panic(err)
@@ -265,21 +280,25 @@ func loadAvailableUsers(startJobs chan<- int64) {
 
 // User holds user data
 type User struct {
-	ID               int64         `db:"id"`
-	ChatID           int64         `db:"chat_id"`
-	Available        bool          `db:"available"`
-	LastActivity     time.Time     `db:"last_activity"`
-	MatchChatID      sql.NullInt64 `db:"match_chat_id"`
-	RegisterDate     time.Time     `db:"register_date"`
-	PreviousMatch    sql.NullInt64 `db:"previous_match"`
-	AllowPictures    bool          `db:"allow_pictures"`
-	BannedUntil      NullTime      `db:"banned_until"`
-	Gender           int           `db:"gender"`
-	Tags             string        `db:"tags"`
-	MatchMode        int           `db:"match_mode"`
-	Email            string        `db:"email"`
-	IsVerify         bool          `db:"is_verify"`
-	IsWaitInputEmail bool          `db:"is_wait_input_email"`
+	ID                     int64         `db:"id"`
+	ChatID                 int64         `db:"chat_id"`
+	Available              bool          `db:"available"`
+	LastActivity           time.Time     `db:"last_activity"`
+	MatchChatID            sql.NullInt64 `db:"match_chat_id"`
+	RegisterDate           time.Time     `db:"register_date"`
+	PreviousMatch          sql.NullInt64 `db:"previous_match"`
+	AllowPictures          bool          `db:"allow_pictures"`
+	BannedUntil            NullTime      `db:"banned_until"`
+	Gender                 int           `db:"gender"`
+	Tags                   string        `db:"tags"`
+	MatchMode              int           `db:"match_mode"`
+	Email                  string        `db:"email"`
+	IsVerify               bool          `db:"is_verify"`
+	IsWaitInputEmail       bool          `db:"is_wait_input_email"`
+	CustomRateLimitEnabled bool          `db:"custom_rate_limit_enabled"`
+	RateLimitUnit          string        `db:"rate_limit_unit"`
+	RateLimitUnitPeriod    int64         `db:"rate_limit_unit_period"`
+	MatchPerRate           int64         `db:"match_per_rate"`
 }
 
 func (u User) IsProfileFinish() bool {
