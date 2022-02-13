@@ -123,8 +123,8 @@ AnyOptionId = 0
 OptionId = 2
 # rate limit endabled
 RateLimitEnabled = true
-# rate limit unit only support "week"
-RateLimitUnit = "week"
+# rate limit unit only support "day"
+RateLimitUnit = "day"
 # match per rate
 MatchPerRate = 2
 
@@ -133,8 +133,8 @@ MatchPerRate = 2
 OptionId = 3
 # rate limit endabled
 RateLimitEnabled = true
-# rate limit unit only support "week"
-RateLimitUnit = "week"
+# rate limit unit only support "day"
+RateLimitUnit = "day"
 # match per rate
 MatchPerRate = 2
 ```
@@ -228,8 +228,8 @@ WhiteEmailEnabled = false
 OptionId = 2
 # rate limit endabled
 RateLimitEnabled = true
-# rate limit unit only support "week"
-RateLimitUnit = "week"
+# rate limit unit only support "day"
+RateLimitUnit = "day"
 # match per rate
 MatchPerRate = 2
 
@@ -238,8 +238,8 @@ MatchPerRate = 2
 OptionId = 3
 # rate limit endabled
 RateLimitEnabled = true
-# rate limit unit only support "week"
-RateLimitUnit = "week"
+# rate limit unit only support "day"
+RateLimitUnit = "day"
 # match per rate
 MatchPerRate = 2
 ```
