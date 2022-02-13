@@ -35,6 +35,7 @@ If you require any help, feel free to contact @aaldentnay !`
 	NotAccessRegisterMessage = `Sorry, you do not have the authorization to register.`
 	RetryInputEmailMessage   = `Mail service send failed, Please re-enter email.`
 	RateLimitMessage         = `You have hit your weekly limit! Wait a few days before trying again. Make a donation and contact @aaldentnay to be a paid user (you’ll be  able to increase the number of times you can press /start !)`
+	InternalErrorMessage     = `An error occurred inside the robot`
 )
 
 // emoji UTF-8 from https://apps.timwhitlock.info/emoji/tables/unicode

@@ -32,11 +32,6 @@ func matchUsers(chatIDs <-chan int64) {
 
 		matchUser, err := service.ServiceMatch(ctx, user.ChatID, user.IsVerify)
 		if err != nil {
-
-			if err == service.ErrRateLimit {
-				_, _ = telegram.SendMessage(user.ChatID, vars.RateLimitMessage, emptyOpts)
-			}
-
 			log.Printf("Error retrieving available users: %s", err)
 			continue
 		}

@@ -44,12 +44,6 @@ func ServiceMatch(ctx context.Context, chatId int64, isVerify bool) (*model.User
 
 	repo := repository.GetRepository()
 
-	// find need match user
-	needMatchUser, err := repo.GetUserByChatId(ctx, chatId)
-	if err != nil {
-		return nil, err
-	}
-
 	// find all question
 	questions, err := repo.GetAllQuestion(ctx)
 	if err != nil {
@@ -65,11 +59,6 @@ func ServiceMatch(ctx context.Context, chatId int64, isVerify bool) (*model.User
 	// find user all user question data
 	userQuestionData, err := repo.GetUserQuestionDataByUser(ctx, chatId)
 	if err != nil {
-		return nil, err
-	}
-
-	// rate limit check
-	if _, err := RateLimit(ctx, needMatchUser, userQuestionData); err != nil {
 		return nil, err
 	}
 
