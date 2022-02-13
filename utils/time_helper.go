@@ -32,7 +32,7 @@ func DayRange(day int) (startTime, endTime int64) {
 
 	now := time.Now()
 	t := now.AddDate(0, 0, -(day - 1))
-	end := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location())
+	end := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location())
 
 	return t.Unix(), end.Unix()
 }
