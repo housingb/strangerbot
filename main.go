@@ -347,22 +347,23 @@ func retrieveOrCreateUser(chatID int64) (User, error) {
 			return u, err
 		}
 
-		telegram.SendMessage(chatID, `Welcome to the A5.2 Telegram Bot! :D
-		To get started enter:
+		telegram.SendMessage(chatID, `Welcome to the Cupid SG Bot! :D
 
-		/start
+                To configure your profile:
 
-		To configure your profile:
+                /setup
 
-		/setup
+                To start a chat, enter:
 
-		If you feel like ending the conversation, type:
+                /start
 
-		/end
+                If you feel like ending the conversation, enter:
 
-		If you want another chat partner, type /start again after typing /end!
-	
-		Have fun!`, emptyOpts)
+                /end
+
+                If you want another chat partner, type /start again after typing /end!
+
+                Have fun!`, emptyOpts)
 	}
 
 	return retrieveUser(chatID)
