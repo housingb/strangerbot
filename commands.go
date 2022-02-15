@@ -132,12 +132,14 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	// rate limit check
 	needMatchUser, err := repo.GetUserByChatId(context.Background(), u.ChatID)
 	if err != nil {
+		log.Println("GetUserByChatId error", err.Error())
 		_, _ = RetrySendMessage(u.ChatID, vars.InternalErrorMessage, emptyOpts)
 		return true
 	}
 
 	userQuestionData, err := repo.GetUserQuestionDataByUser(context.Background(), needMatchUser.ChatID)
 	if err != nil {
+		log.Println("GetUserQuestionDataByUser error", err.Error())
 		_, _ = RetrySendMessage(u.ChatID, vars.InternalErrorMessage, emptyOpts)
 		return true
 	}
@@ -146,6 +148,7 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 		if err == service.ErrRateLimit {
 			_, _ = RetrySendMessage(u.ChatID, vars.RateLimitMessage, emptyOpts)
 		} else {
+			log.Println("RateLimit error", err.Error())
 			_, _ = RetrySendMessage(u.ChatID, vars.InternalErrorMessage, emptyOpts)
 		}
 		return true
