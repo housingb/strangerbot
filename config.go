@@ -28,9 +28,10 @@ type WhiteList struct {
 }
 
 type Telegram struct {
-	Namespace string
-	Secret    string
-	BotKey    string
+	Namespace           string
+	Secret              string
+	BotKey              string
+	ChangeGenderEnabled bool
 }
 
 type RedisConf struct {

@@ -79,6 +79,7 @@ func main() {
 	}
 
 	// init white cfg
+	vars.ChangeGenderEnabled = cfg.Telegram.ChangeGenderEnabled
 	vars.WhiteDomainEnabled = cfg.WhiteList.WhiteDomainEnabled
 	vars.WhiteDomain = cfg.WhiteList.WhiteDomain
 	vars.WhiteEmailEnabled = cfg.WhiteList.WhiteEmailEnabled

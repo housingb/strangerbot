@@ -1,6 +1,8 @@
 package vars
 
 var (
+	ChangeGenderEnabled = true
+
 	WhiteDomainEnabled = false
 	WhiteDomain        = ""
 	WhiteEmailEnabled  = false
