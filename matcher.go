@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"strangerbot/repository"
 	"strangerbot/repository/model"
@@ -87,6 +88,7 @@ func matchUsers(chatIDs <-chan int64) {
 
 		createMatch(user.ChatID, user.ID, matchUser.ChatID, matchUser.ID, userProfileStr, userGoals, matchedUserProfileStr, matchedUserGoals)
 
+		time.Sleep(100 * time.Millisecond)
 	}
 
 }
