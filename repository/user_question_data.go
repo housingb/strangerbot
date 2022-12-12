@@ -5,9 +5,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/jinzhu/gorm"
 	"strangerbot/repository/model"
 	"strangerbot/vars"
+
+	"github.com/jinzhu/gorm"
 )
 
 func (r *Repository) UserQuestionDataAdd(ctx context.Context, po *model.UserQuestionData) error {
@@ -99,6 +100,58 @@ func (p *Repository) GetUserQuestionDataByUser(ctx context.Context, chatId int64
 		}
 		log.Println(err.Error())
 		return nil, err
+	}
+
+	return list, nil
+}
+
+func (p *Repository) GetUserQuestionDataByUsers(ctx context.Context, chatId []int64) ([]*model.UserQuestionData, error) {
+
+	q := p.db.Where("chat_id IN(?) AND is_del = 0", chatId)
+
+	var list []*model.UserQuestionData
+
+	if err := q.Model(&model.UserQuestionData{}).Find(&list).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func (p *Repository) LoadUserQuestionDataByUsers(ctx context.Context, chatIds []int64) ([]*model.UserQuestionData, error) {
+
+	list := make([]*model.UserQuestionData, 0, 1000)
+
+	// 定义每页的大小
+	pageSize := 500
+
+	// 计算总页数
+	totalPages := (len(chatIds) + pageSize - 1) / pageSize
+
+	// 遍历每一页
+	for page := 1; page <= totalPages; page++ {
+
+		// 计算当前页应该遍历的元素的起始位置和结束位置
+		start := (page - 1) * pageSize
+		end := start + pageSize
+		if end > len(chatIds) {
+			end = len(chatIds)
+		}
+
+		readChatIds := chatIds[start:end]
+
+		rs, err := p.GetUserQuestionDataByUsers(ctx, readChatIds)
+		if err != nil {
+			return nil, err
+		}
+		if len(rs) > 0 {
+			list = append(list, rs...)
+		}
+
 	}
 
 	return list, nil

@@ -3,67 +3,67 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
-	"strings"
-	"time"
-
+	"runtime"
 	"strangerbot/repository"
 	"strangerbot/repository/model"
 	"strangerbot/service"
 	"strangerbot/vars"
+	"strings"
+	"time"
 )
 
-func matchUsers(chatIDs <-chan int64) {
+func loopMatchUsers() {
+
+	for {
+		matchUsers()
+		time.Sleep(1 * time.Second)
+		runtime.GC()
+		time.Sleep(vars.MatchBackoff)
+	}
+
+}
+
+func matchUsers() {
 
 	ctx := context.TODO()
 
-	for c := range chatIDs {
+	mud, err := service.ServiceGlobalMatch(ctx)
+	if err != nil {
+		return
+	}
 
-		user, err := retrieveUser(c)
+	if len(mud) == 0 {
+		return
+	}
 
-		if err != nil {
-			log.Printf("Error in matcher: %s", err)
-			continue
-		}
+	repo := repository.GetRepository()
 
-		if !user.Available || user.MatchChatID.Valid {
-			log.Println("User already assigned")
-			continue
-		}
+	// find all question
+	questions, err := repo.GetAllQuestion(ctx)
+	if err != nil {
+		return
+	}
 
-		matchUser, err := service.ServiceMatch(ctx, user.ChatID, user.IsVerify)
-		if err != nil {
-			log.Printf("Error retrieving available users: %s", err)
-			continue
-		}
+	// find all question option
+	options, err := repo.GetAllOption(ctx)
+	if err != nil {
+		return
+	}
 
-		if matchUser == nil {
-			continue
-		}
+	for i, item := range mud {
 
-		// start get user profile and matched user profile
-
-		repo := repository.GetRepository()
-
-		// find all question
-		questions, err := repo.GetAllQuestion(ctx)
-		if err != nil {
-			continue
-		}
-
-		// find all question option
-		options, err := repo.GetAllOption(ctx)
-		if err != nil {
+		// save match
+		if err := service.ServiceSaveMatch(ctx, mud[i]); err != nil {
 			continue
 		}
 
 		// find user all user question data
-		userQuestionData, err := repo.GetUserQuestionDataByUser(ctx, user.ChatID)
+		userQuestionData, err := repo.GetUserQuestionDataByUser(ctx, item.User.ChatID)
 		if err != nil {
 			continue
 		}
 
-		matchedUserQuestionData, err := repo.GetUserQuestionDataByUser(ctx, matchUser.ChatID)
+		matchedUserQuestionData, err := repo.GetUserQuestionDataByUser(ctx, item.MatchMatchUserData.User.ChatID)
 		if err != nil {
 			continue
 		}
@@ -78,6 +78,7 @@ func matchUsers(chatIDs <-chan int64) {
 
 		// user and matched user goals
 		var userGoals, matchedUserGoals string
+
 		if vars.GoalsQuestionId > 0 {
 			goalsOptions := model.Options(options).GetOptionsByQuestionId(vars.GoalsQuestionId)
 			userGoalsOptions := model.UserQuestionDataList(userQuestionData).GetUserQuestionDataByOptions(ctx, goalsOptions)
@@ -86,23 +87,13 @@ func matchUsers(chatIDs <-chan int64) {
 			matchedUserGoals = strings.Join(model.Options(options).GetOptionsByIds(matchedUserGoalsOptions.GetOptionIds()), ",")
 		}
 
-		createMatch(user.ChatID, user.ID, matchUser.ChatID, matchUser.ID, userProfileStr, userGoals, matchedUserProfileStr, matchedUserGoals)
+		sendMatchMessage(item.User.ChatID, item.MatchMatchUserData.User.ChatID, userProfileStr, userGoals, matchedUserProfileStr, matchedUserGoals)
 
-		time.Sleep(100 * time.Millisecond)
 	}
 
 }
 
-func createMatch(userChatId, userId, matchUserChatId, matchUserId int64, userProfile, userGoals, matchedUserProfile, matchedUserGoals string) {
-
-	query := "UPDATE users SET match_chat_id = ? WHERE id = ?"
-
-	db.Exec(query, userChatId, matchUserId)
-	db.Exec(query, matchUserChatId, userId)
-
-	// record
-	_ = service.ServiceMatchedDetailRecord(context.Background(), userChatId, matchUserChatId)
-	_ = service.ServiceMatchedDetailRecord(context.Background(), matchUserChatId, userChatId)
+func sendMatchMessage(userChatId, matchUserChatId int64, userProfile, userGoals, matchedUserProfile, matchedUserGoals string) {
 
 	if len(userProfile) == 0 {
 		userProfile = "(!NOT SETTING)"

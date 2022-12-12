@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/repository/gorm_global"
 	"strangerbot/vars"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -143,6 +144,17 @@ func (q Questions) CheckUserFillFull(userData []*UserQuestionData, isVerify bool
 	}
 
 	return false, rs
+}
+
+func (q Questions) GenMappingQuestion() map[int64]*Question {
+
+	rs := make(map[int64]*Question)
+	for i, item := range q {
+
+		rs[item.ID] = q[i]
+	}
+
+	return rs
 }
 
 func (q Questions) GetMatchingMappingQuestion() map[int64]*Question {

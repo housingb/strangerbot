@@ -1,5 +1,9 @@
 package vars
 
+import (
+	"time"
+)
+
 var (
 	// debug or prod
 	RUN_MODE = "prod"
@@ -47,4 +51,9 @@ const (
 // set goals question id, it work for MatchedMessage.
 const (
 	GoalsQuestionId int64 = 7
+)
+
+// match loop backoff
+var (
+	MatchBackoff = 10 * time.Second
 )

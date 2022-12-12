@@ -15,6 +15,7 @@ type User struct {
 	RateLimitUnit          string        `db:"rate_limit_unit"`
 	RateLimitUnitPeriod    int64         `db:"rate_limit_unit_period"`
 	MatchPerRate           int64         `db:"match_per_rate"`
+	MemberLevel            int64         `db:"member_level"`
 }
 
 func (p *User) TableName() string {

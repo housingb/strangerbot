@@ -7,12 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Machiel/telegrambot"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/otpgateway"
 	"strangerbot/repository"
 	"strangerbot/service"
 	"strangerbot/vars"
+
+	"github.com/Machiel/telegrambot"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // CommandHandler supplies an interface for handling messages
@@ -158,8 +159,6 @@ func commandStart(u User, m *tgbotapi.Message) bool {
 	db.Exec("UPDATE users SET available = 1 WHERE chat_id = ?", u.ChatID)
 
 	_, _ = RetrySendMessage(u.ChatID, vars.StartMatchingMessage, emptyOpts)
-
-	startJobs <- u.ChatID
 
 	return true
 }

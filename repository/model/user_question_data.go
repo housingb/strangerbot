@@ -65,3 +65,15 @@ func (u UserQuestionDataList) CheckExistsOption(optionId int64) bool {
 
 	return false
 }
+
+func (u UserQuestionDataList) GetByChatId(chatId int64) UserQuestionDataList {
+
+	rs := make([]*UserQuestionData, 0, len(u))
+	for i, item := range u {
+		if item.ChatId == chatId {
+			rs = append(rs, u[i])
+		}
+	}
+
+	return rs
+}

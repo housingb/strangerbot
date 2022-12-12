@@ -14,15 +14,16 @@ import (
 	"syscall"
 	"time"
 
+	"strangerbot/otpgateway"
+	"strangerbot/otpgateway/smtp"
+	"strangerbot/repository"
+	"strangerbot/vars"
+
 	"github.com/Machiel/telegrambot"
 	_ "github.com/go-sql-driver/mysql"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
-	"strangerbot/otpgateway"
-	"strangerbot/otpgateway/smtp"
-	"strangerbot/repository"
-	"strangerbot/vars"
 )
 
 var (
@@ -173,23 +174,14 @@ func main() {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go func(jobs <-chan int64) {
+	go func() {
 		defer wg.Done()
 		log.Println("Starting match user job")
-		matchUsers(jobs)
-	}(startJobs)
-
-	for j := 0; j < 1; j++ {
-		wg.Add(1)
-		go func(jobs chan<- int64) {
-			defer wg.Done()
-			log.Println("Started load available user job")
-			loadAvailableUsers(jobs)
-		}(startJobs)
-	}
+		loopMatchUsers()
+	}()
 
 	var workerWg sync.WaitGroup
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 5; i++ {
 		workerWg.Add(1)
 		go func(queue <-chan *tgbotapi.Update) {
 			defer workerWg.Done()
@@ -250,7 +242,6 @@ func main() {
 
 	workerWg.Wait()
 
-	close(startJobs)
 	close(endConversationQueue)
 
 	log.Printf("Waiting for goroutines to stop...")
