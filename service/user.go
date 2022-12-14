@@ -328,7 +328,6 @@ func ServiceSaveMatch(ctx context.Context, mud *model.MatchUserData) error {
 	defer func() {
 		if err := repo.Rollback(); err != nil {
 		}
-		_ = repo.GetDB().Close()
 	}()
 
 	if err := repo.UpdateMatchId(ctx, mud.User.ID, mud.MatchChatId); err != nil {
