@@ -207,7 +207,7 @@ func ServiceGlobalMatch(ctx context.Context) ([]*model.MatchUserData, error) {
 			continue
 		}
 
-		if mud.MatchChatId > 0 {
+		if mud.MatchChatId != 0 {
 			continue
 		}
 
@@ -222,7 +222,7 @@ func ServiceGlobalMatch(ctx context.Context) ([]*model.MatchUserData, error) {
 				continue
 			}
 
-			if mud2.MatchChatId > 0 {
+			if mud2.MatchChatId != 0 {
 				continue
 			}
 
