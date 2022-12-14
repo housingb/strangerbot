@@ -16,6 +16,7 @@ type User struct {
 	RateLimitUnitPeriod    int64         `db:"rate_limit_unit_period"`
 	MatchPerRate           int64         `db:"match_per_rate"`
 	MemberLevel            int64         `db:"member_level"`
+	IsVerify               bool          `db:"is_verify"`
 }
 
 func (p *User) TableName() string {

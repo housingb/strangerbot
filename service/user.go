@@ -141,10 +141,12 @@ func ServiceGlobalMatch(ctx context.Context) ([]*model.MatchUserData, error) {
 			continue
 		}
 
+		// verified user matching
 		tmp := &model.MatchUserData{
-			ChatId:      u.ChatID,
-			User:        users[i],
-			MatchChatId: 0,
+			ChatId:         u.ChatID,
+			User:           users[i],
+			MatchChatId:    0,
+			VerifyOptionId: model.UserQuestionDataList(userQuestionData).GetFirstOptionIdByQuestionId(vars.MatchingQuestionId),
 		}
 
 		profileQuestions := make(map[int64]*model.ProfileQuestion)
@@ -239,6 +241,19 @@ func ServiceGlobalMatch(ctx context.Context) ([]*model.MatchUserData, error) {
 
 func CheckMatch(requestUser *model.MatchUserData, targetUser *model.MatchUserData) bool {
 
+	// verify
+	switch requestUser.VerifyOptionId {
+	case vars.MatchingVerifiedOptionId:
+		if !targetUser.User.IsVerify {
+			return false
+		}
+	case vars.MatchingUnverifiedOptionId:
+		if targetUser.User.IsVerify {
+			return false
+		}
+	}
+
+	// question match
 	for _, mq := range requestUser.MatchCriteriaQuestions {
 
 		if mq.MatchingQuestion.MatchingQuestionId == 0 || mq.MatchingQuestion.MatchingQuestionId == vars.MatchingQuestionId {
@@ -246,9 +261,20 @@ func CheckMatch(requestUser *model.MatchUserData, targetUser *model.MatchUserDat
 		}
 
 		// find profile question
+		profileQuestion := false
 		pq, ok := targetUser.PersonalInfoQuestions[mq.MatchingQuestion.MatchingQuestionId]
-		if !ok {
-			return false
+		if ok {
+			profileQuestion = true
+		}
+
+		matchQuestion := false
+		matchq, ok := targetUser.MatchCriteriaQuestions[mq.MatchingQuestion.MatchingQuestionId]
+		if ok {
+			matchQuestion = true
+		}
+
+		if (!matchQuestion) && (!profileQuestion) {
+			continue
 		}
 
 		qMatch := false
@@ -260,10 +286,19 @@ func CheckMatch(requestUser *model.MatchUserData, targetUser *model.MatchUserDat
 			}
 
 			found := false
-			for _, po := range pq.ProfileOptions {
-				if mo.MatchingOptionId == po.ID {
-					found = true
-					break
+			if profileQuestion {
+				for _, po := range pq.ProfileOptions {
+					if mo.MatchingOptionId == po.ID {
+						found = true
+						break
+					}
+				}
+			} else {
+				for _, po := range matchq.MatchingOptions {
+					if mo.MatchingOptionId == po.ID {
+						found = true
+						break
+					}
 				}
 			}
 

@@ -7,6 +7,7 @@ type MatchUserData struct {
 	MatchCriteriaQuestions map[int64]*MatchingQuestion
 	MatchChatId            int64
 	MatchMatchUserData     *MatchUserData
+	VerifyOptionId         int64
 }
 
 type ProfileQuestion struct {
