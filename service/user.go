@@ -228,7 +228,7 @@ func ServiceGlobalMatch(ctx context.Context) ([]*model.MatchUserData, error) {
 
 			if CheckMatch(mud, mud2) && CheckMatch(mud2, mud) {
 				mud.MatchChatId = mud2.ChatId
-				mud2.MatchChatId = mud.MatchChatId
+				mud2.MatchChatId = mud.ChatId
 				mud.MatchMatchUserData = mud2
 				mud2.MatchMatchUserData = mud
 				matchedResult = append(matchedResult, mud)
