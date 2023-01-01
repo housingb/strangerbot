@@ -3,11 +3,12 @@ package service
 import (
 	"context"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/keyboard"
 	"strangerbot/repository"
 	"strangerbot/repository/model"
 	"strangerbot/vars"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func ServiceMenu(ctx context.Context, chatId int64, data *keyboard.KeyboardCallbackDataPlus, userVerify bool) ([]*tgbotapi.MessageConfig, error) {

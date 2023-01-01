@@ -3,11 +3,13 @@ package model
 import (
 	"context"
 	"fmt"
+	"sort"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/keyboard"
 	"strangerbot/repository/gorm_global"
 	"strangerbot/vars"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type QuestionOption struct {
@@ -69,9 +71,25 @@ func (m Options) GetKeyboardButton(userDatas map[int64]*UserQuestionData) [][]tg
 
 	}
 
+	rrr := make([]struct {
+		Key   int64
+		Value []tgbotapi.InlineKeyboardButton
+	}, 0, len(rowMap))
+
+	for k, v := range rowMap {
+		rrr = append(rrr, struct {
+			Key   int64
+			Value []tgbotapi.InlineKeyboardButton
+		}{Key: k, Value: v})
+	}
+
+	sort.Slice(rrr, func(i, j int) bool {
+		return rrr[i].Key < rrr[j].Key
+	})
+
 	rs := make([][]tgbotapi.InlineKeyboardButton, 0, len(rowMap))
-	for _, v := range rowMap {
-		rs = append(rs, v)
+	for _, v := range rrr {
+		rs = append(rs, v.Value)
 	}
 
 	return rs

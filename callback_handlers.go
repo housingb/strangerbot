@@ -7,10 +7,11 @@ import (
 	"log"
 	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strangerbot/keyboard"
 	"strangerbot/service"
 	"strangerbot/vars"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
@@ -43,8 +44,9 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 	}
 
 	var (
-		msgs []*tgbotapi.MessageConfig
-		cbs  []tgbotapi.CallbackConfig
+		msgs    []*tgbotapi.MessageConfig
+		cbs     []tgbotapi.CallbackConfig
+		editMsg tgbotapi.Chattable
 	)
 	switch data.ButtonType {
 	case keyboard.BUTTON_TYPE_MENU:
@@ -85,7 +87,7 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 
 		}
 
-		msgs, cbs, err = service.ServiceQuestionOption(ctx, callbackQuery.Message.Chat.ID, data)
+		msgs, cbs, editMsg, err = service.ServiceQuestionOption(ctx, callbackQuery, callbackQuery.Message.Chat.ID, data)
 		if err != nil {
 			return
 		}
@@ -98,6 +100,11 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 		if err != nil {
 			log.Println(err.Error())
 		}
+	}
+
+	if editMsg != nil {
+		_, err = telegramBot.Send(editMsg)
+		return
 	}
 
 	if len(msgs) == 0 {
@@ -120,97 +127,6 @@ func handleCallbackQuery(callbackQuery *tgbotapi.CallbackQuery) {
 			return
 		}
 	}
-
-	//switch obj.OptionType {
-	//case GenderOptionType:
-	//
-	//	// update gender
-	//	updateGender(u.ID, obj.OptionValue)
-	//
-
-	//
-	//	{
-	//		msg := tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, fmt.Sprintf("You selected %s as your Gender. %s", obj.GetOptionText(), obj.GetOptionNoteText()))
-	//		telegramBot.Send(msg)
-	//	}
-	//
-	//	{
-	//		msg := tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, `What gender do you want to match with?`)
-	//
-	//		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup([]tgbotapi.InlineKeyboardButton{
-	//			{
-	//				Text:         MatchModeOptionMaleText + MatchModeOptionMaleNoteText,
-	//				CallbackData: &MatchModeMale,
-	//			},
-	//			{
-	//				Text:         MatchModeOptionFemaleText + MatchModeOptionFemaleNoteText,
-	//				CallbackData: &MatchModeFemale,
-	//			},
-	//			{
-	//				Text:         MatchModeOptionAnythingText + MatchModeOptionAnythingNoteText,
-	//				CallbackData: &MatchModeAnything,
-	//			},
-	//		})
-	//
-	//		_, err := telegramBot.Send(msg)
-	//		if err != nil {
-	//			log.Println(err.Error())
-	//		}
-	//	}
-	//
-	//case MatchModeOptionType:
-	//
-	//	// update gender
-	//	updateMathMode(u.ID, obj.OptionValue)
-	//
-	//	// handle message
-	//	{
-	//		msg := tgbotapi.NewDeleteMessage(callbackQuery.Message.Chat.ID, callbackQuery.Message.MessageID)
-	//		telegramBot.Send(msg)
-	//	}
-	//
-	//	{
-	//		msg := tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, fmt.Sprintf("You selected %s as your Match. %s", obj.GetOptionText(), obj.GetOptionNoteText()))
-	//		telegramBot.Send(msg)
-	//	}
-	//
-	//	{
-	//		msg := tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, `What are you here for?`)
-	//
-	//		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup([]tgbotapi.InlineKeyboardButton{
-	//			{
-	//				Text:         GoalOptionDatingText + GoalOptionDatingNoteText,
-	//				CallbackData: &GoalDating,
-	//			},
-	//			{
-	//				Text:         GoalOptionFriendsText + GoalOptionFriendsNoteText,
-	//				CallbackData: &GoalFriends,
-	//			},
-	//		})
-	//
-	//		_, err := telegramBot.Send(msg)
-	//		if err != nil {
-	//			log.Println(err.Error())
-	//		}
-	//	}
-	//
-	//case GoalOptionType:
-	//
-	//	// update tags
-	//	updateTags(u.ID, obj.GetOptionText())
-	//
-	//	// handle message
-	//	{
-	//		msg := tgbotapi.NewDeleteMessage(callbackQuery.Message.Chat.ID, callbackQuery.Message.MessageID)
-	//		telegramBot.Send(msg)
-	//	}
-	//
-	//	{
-	//		msg := tgbotapi.NewMessage(callbackQuery.Message.Chat.ID, fmt.Sprintf("You selected %s as your Goal. %s", obj.GetOptionText(), obj.GetOptionNoteText()))
-	//		telegramBot.Send(msg)
-	//	}
-	//
-	//}
 
 }
 
