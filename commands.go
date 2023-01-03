@@ -175,9 +175,9 @@ func commandStop(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
-	if !u.Available {
-		return false
-	}
+	//if u.Available {
+	//	return false
+	//}
 
 	_, _ = RetrySendMessage(u.ChatID, "We're ending the conversation...", emptyOpts)
 
