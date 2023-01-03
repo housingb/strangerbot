@@ -175,10 +175,13 @@ func commandStop(u User, m *tgbotapi.Message) bool {
 		return false
 	}
 
-	//if u.Available {
-	//	return false
-	//}
+	if (!u.Available) && (!u.MatchChatID.Valid) {
+		_, _ = RetrySendMessage(u.ChatID, "You don't have conversation,Type /start to get matched with a new partner.", emptyOpts)
+		return true
+	}
 
+	//if u.MatchChatID.Valid && u.MatchChatID.Int64 != 0 {
+	//}
 	_, _ = RetrySendMessage(u.ChatID, "We're ending the conversation...", emptyOpts)
 
 	endConversationQueue <- EndConversationEvent{ChatID: u.ChatID}
