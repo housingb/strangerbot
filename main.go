@@ -340,7 +340,7 @@ func retrieveOrCreateUser(chatID int64) (User, error) {
 			return u, err
 		}
 
-		telegram.SendMessage(chatID, `Welcome to the Cupid SG Bot! :D
+		telegram.SendMessage(chatID, `Welcome to the NUS Match Bot! :D
 
                 To configure your profile:
 
