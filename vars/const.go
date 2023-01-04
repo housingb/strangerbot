@@ -38,7 +38,7 @@ If you require any help, feel free to contact @aaldentnay !`
 	OTPSuccessMessage        = `Successfully registered! Please click /setup if you are not done setting up for the other options (including match settings), or /start to match.`
 	NotAccessRegisterMessage = `Sorry, you are not authorised to register.`
 	RetryInputEmailMessage   = `Mail service send failed, Please re-enter email.`
-	RateLimitMessage         = `You have hit your weekly limit! Wait a few days before trying again. Make a donation and contact @aaldentnay to be a paid user (you’ll be  able to increase the number of times you can press /start !)`
+	RateLimitMessage         = `You have hit your weekly limit! Wait a few days before trying again. Make a donation and contact @aaldentnay to be a paid user (you’ll be  able to increase the number of times you can press /start !) More info @unichatbotchannel`
 	InternalErrorMessage     = `An error occurred inside the robot`
 	ChangeGenderErrorMessage = `Gender change is not supported`
 )
